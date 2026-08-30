@@ -1,0 +1,23 @@
+{
+  "name": "tree-sitter-cartan",
+  "version": "0.3.0",
+  "description": "tree-sitter grammar for cartan documents (.cart)",
+  "license": "MIT",
+  "main": "bindings/node",
+  "keywords": ["parser", "tree-sitter", "cartan", "cart"],
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test",
+    "parse": "tree-sitter parse"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.25.0"
+  },
+  "tree-sitter": [
+    {
+      "scope": "source.cartan",
+      "file-types": ["cart"],
+      "injection-regex": "^(cartan|cart)$"
+    }
+  ]
+}

@@ -1,0 +1,1257 @@
+================================================================
+the four zones, in order
+================================================================
+
+field = canvas2d(xr, yr) : { count: 8 } { w } with nav(xr, "x")
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (with_expression
+      target: (payload_expression
+        target: (config_expression
+          target: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)
+              (identifier)))
+          config: (map
+            (map_entry
+              key: (identifier)
+              value: (number))))
+        body: (body
+          (identifier)))
+      control: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)
+          (string))))))
+
+================================================================
+a with-chain continues across lines
+================================================================
+
+field = canvas2d(xr, yr) { w }
+with nav(xr, "x")
+with tap {
+    xr <- pad(xextent(w), 0.05)
+    yr <- pad(yextent(w), 0.05)
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (with_expression
+      target: (with_expression
+        target: (payload_expression
+          target: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)
+              (identifier)))
+          body: (body
+            (identifier)))
+        control: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)
+            (string))))
+      control: (tap_expression
+        body: (body
+          (write
+            target: (port_path
+              (identifier))
+            value: (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (identifier)))
+                (number))))
+          (write
+            target: (port_path
+              (identifier))
+            value: (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (identifier)))
+                (number)))))))))
+
+================================================================
+an every header bars a juxtaposed body
+================================================================
+
+every 1.0 / 30.0 while time < 120.0 { time <- time + 1.0 }
+
+----------------------------------------------------------------
+
+(source_file
+  (agent
+    period: (binary_expression
+      left: (number)
+      right: (number))
+    guard: (binary_expression
+      left: (identifier)
+      right: (number))
+    body: (body
+      (write
+        target: (port_path
+          (identifier))
+        value: (binary_expression
+          left: (identifier)
+          right: (number))))))
+
+================================================================
+main is a binding of a configured block, its rows one per line
+================================================================
+
+main = block : { gap: 10 } {
+    [ yband(yr, ty), field         ]
+    [ block,         xband(xr, tx) ]
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (config_expression
+        target: (identifier)
+        config: (map
+          (map_entry
+            key: (identifier)
+            value: (number))))
+      body: (body
+        (list
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)
+              (identifier)))
+          (identifier))
+        (list
+          (identifier)
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)
+              (identifier))))))))
+
+================================================================
+a subscript states ranges, rel marks, and the open-ended forms
+================================================================
+
+half = wave[4..10]
+tail = wave[rel(-50..=-1)]
+row = f[1, ..]
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (index_expression
+      target: (identifier)
+      index: (subscript
+        (selector
+          (range_expression
+            left: (number)
+            right: (number))))))
+  (binding
+    name: (identifier)
+    value: (index_expression
+      target: (identifier)
+      index: (subscript
+        (selector
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (range_expression
+                left: (unary_expression
+                  operand: (number))
+                right: (unary_expression
+                  operand: (number)))))))))
+  (binding
+    name: (identifier)
+    value: (index_expression
+      target: (identifier)
+      index: (subscript
+        (selector
+          (number))
+        (selector)))))
+
+================================================================
+a function declares its configuration
+================================================================
+
+xband(r, t) : { thickness: 30 } = canvas1d(r) : { thickness: thickness } {
+    marks(t) : { across: [0.0, 0.25] }
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier))
+      (parameter
+        name: (identifier)))
+    config: (map
+      (map_entry
+        key: (identifier)
+        value: (number)))
+    body: (payload_expression
+      target: (config_expression
+        target: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))
+        config: (map
+          (map_entry
+            key: (identifier)
+            value: (identifier))))
+      body: (body
+        (config_expression
+          target: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)))
+          config: (map
+            (map_entry
+              key: (identifier)
+              value: (list
+                (number)
+                (number)))))))))
+
+================================================================
+ports, locals, and a Map bound to a name
+================================================================
+
+port freq = 3.0
+state time = 0.0
+tickstyle = { across: [0.0, 0.25] }
+v = { n := 4, linspace(0.0, 1.0, n) }
+
+----------------------------------------------------------------
+
+(source_file
+  (port_declaration
+    name: (identifier)
+    value: (number))
+  (port_declaration
+    name: (identifier)
+    value: (number))
+  (binding
+    name: (identifier)
+    value: (map
+      (map_entry
+        key: (identifier)
+        value: (list
+          (number)
+          (number)))))
+  (binding
+    name: (identifier)
+    value: (body
+      (local
+        name: (identifier)
+        value: (number))
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (number)
+          (number)
+          (identifier))))))
+
+================================================================
+a comparison decides a Bool, and the logic reads over it
+================================================================
+
+band = x > 0.0 and not (y == 1.0)
+c = shade(band, teal, faded)
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (binary_expression
+      left: (binary_expression
+        left: (identifier)
+        right: (number))
+      right: (unary_expression
+        operand: (parenthesized_expression
+          (binary_expression
+            left: (identifier)
+            right: (number))))))
+  (binding
+    name: (identifier)
+    value: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (identifier)
+        (identifier)
+        (identifier)))))
+
+================================================================
+configuration chains, and a name in it reaches
+================================================================
+
+a = marks(t) : base : { width: 9.0 }
+b = marks(t) : styles[i]
+c = marks(t) : style(2.0)
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (config_expression
+      target: (config_expression
+        target: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))
+        config: (identifier))
+      config: (map
+        (map_entry
+          key: (identifier)
+          value: (number)))))
+  (binding
+    name: (identifier)
+    value: (config_expression
+      target: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)))
+      config: (index_expression
+        target: (identifier)
+        index: (subscript
+          (selector
+            (identifier))))))
+  (binding
+    name: (identifier)
+    value: (config_expression
+      target: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)))
+      config: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (number))))))
+
+================================================================
+a used document's names are reached through its namespace
+================================================================
+
+use "figure.cart" as fig
+
+th = thm.select(mode)
+
+main = block {
+    [ block, fig.xband(xr, tx) ]
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (use_declaration
+    path: (string)
+    alias: (identifier))
+  (binding
+    name: (identifier)
+    value: (call_expression
+      function: (qualified_identifier
+        namespace: (identifier)
+        name: (identifier))
+      arguments: (argument_list
+        (identifier))))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (list
+          (identifier)
+          (call_expression
+            function: (qualified_identifier
+              namespace: (identifier)
+              name: (identifier))
+            arguments: (argument_list
+              (identifier)
+              (identifier))))))))
+
+================================================================
+a with-chain attaches to a bare call, with no configuration between
+================================================================
+
+port tapped = true
+
+main = block {
+    text(if tapped then "hi" else "bye") with tap { tapped <- not tapped }
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (port_declaration
+    name: (identifier)
+    value: (boolean))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (with_expression
+          target: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (conditional_expression
+                condition: (identifier)
+                consequence: (string)
+                alternative: (string))))
+          control: (tap_expression
+            body: (body
+              (write
+                target: (port_path
+                  (identifier))
+                value: (unary_expression
+                  operand: (identifier))))))))))
+
+================================================================
+a tap carries its configuration between head and writes
+================================================================
+
+reset = tap : { hint: "reset" } { cr <- extent(f) }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (tap_expression
+      config: (map
+        (map_entry
+          key: (identifier)
+          value: (string)))
+      body: (body
+        (write
+          target: (port_path
+            (identifier))
+          value: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier))))))))
+
+================================================================
+the mark and the prime state a derivative at the call
+================================================================
+
+df = f'(x)
+mp = g(:a, ::b, c)
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (call_expression
+      function: (identifier)
+      primes: (primes)
+      arguments: (argument_list
+        (identifier))))
+  (binding
+    name: (identifier)
+    value: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        mark: (mark)
+        (identifier)
+        mark: (mark)
+        (identifier)
+        (identifier)))))
+
+================================================================
+the action operator composes then acts, left-associative
+================================================================
+
+s = g @ a @ b
+w = (r1 * r2) @ v
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (binary_expression
+      left: (binary_expression
+        left: (identifier)
+        right: (identifier))
+      right: (identifier)))
+  (binding
+    name: (identifier)
+    value: (binary_expression
+      left: (parenthesized_expression
+        (binary_expression
+          left: (identifier)
+          right: (identifier)))
+      right: (identifier))))
+
+================================================================
+none is a literal, and the presence guard reads it
+================================================================
+
+port m = none
+
+main = block {
+    text(if m == none then "away" else fmt(m))
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (port_declaration
+    name: (identifier)
+    value: (none))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (conditional_expression
+              condition: (binary_expression
+                left: (identifier)
+                right: (none))
+              consequence: (string)
+              alternative: (call_expression
+                function: (identifier)
+                arguments: (argument_list
+                  (identifier))))))))))
+
+================================================================
+a range is the loosest operator, and a box literal is a list of them
+================================================================
+
+r = 0..n - 1
+c = 0..=9
+b = [0..10, 5..10]
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (range_expression
+      left: (number)
+      right: (binary_expression
+        left: (identifier)
+        right: (number))))
+  (binding
+    name: (identifier)
+    value: (range_expression
+      left: (number)
+      right: (number)))
+  (binding
+    name: (identifier)
+    value: (list
+      (range_expression
+        left: (number)
+        right: (number))
+      (range_expression
+        left: (number)
+        right: (number)))))
+
+================================================================
+a comprehension binds over a stated box, and the brace is its body
+================================================================
+
+B = for i in 0..100 { i }
+o = for (i, j) in [0..10, 0..10] { xw[i] * yw[j] }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (range_expression
+        left: (number)
+        right: (number))
+      body: (body
+        (identifier))))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier)
+        (identifier))
+      space: (list
+        (range_expression
+          left: (number)
+          right: (number))
+        (range_expression
+          left: (number)
+          right: (number)))
+      body: (body
+        (binary_expression
+          left: (index_expression
+            target: (identifier)
+            index: (subscript
+              (selector
+                (identifier))))
+          right: (index_expression
+            target: (identifier)
+            index: (subscript
+              (selector
+                (identifier)))))))))
+
+================================================================
+each is the List comprehension beside for, braced or bare
+================================================================
+
+ys = each x in xs { x + 1.0 }
+ds = each i in 0..4 i * 1.0
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (each_expression
+      binders: (binder_list
+        (identifier))
+      collection: (identifier)
+      body: (body
+        (binary_expression
+          left: (identifier)
+          right: (number)))))
+  (binding
+    name: (identifier)
+    value: (each_expression
+      binders: (binder_list
+        (identifier))
+      collection: (range_expression
+        left: (number)
+        right: (number))
+      body: (binary_expression
+        left: (identifier)
+        right: (number)))))
+
+================================================================
+the recurrence header takes the brace and the colon after it
+================================================================
+
+traj = fold u := u0 for t in ts while ok(u) : { max_iter: 10 } { step(u, t) }
+tot = reduce s := 0.0 for x in xs { s + x }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (fold_expression
+      accumulator: (identifier)
+      seed: (identifier)
+      element: (identifier)
+      driver: (identifier)
+      guard: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)))
+      config: (map
+        (map_entry
+          key: (identifier)
+          value: (number)))
+      body: (body
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)
+            (identifier))))))
+  (binding
+    name: (identifier)
+    value: (fold_expression
+      accumulator: (identifier)
+      seed: (number)
+      element: (identifier)
+      driver: (identifier)
+      body: (body
+        (binary_expression
+          left: (identifier)
+          right: (identifier))))))
+
+================================================================
+a comprehension binds the whole site, and its brace is optional
+================================================================
+
+S = for I in [0..10, 0..10] { u[I + e] }
+d = for i in 1..n u[i] - u[i - 1]
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (list
+        (range_expression
+          left: (number)
+          right: (number))
+        (range_expression
+          left: (number)
+          right: (number)))
+      body: (body
+        (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (binary_expression
+                left: (identifier)
+                right: (identifier))))))))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (range_expression
+        left: (number)
+        right: (identifier))
+      body: (binary_expression
+        left: (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (identifier))))
+        right: (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (binary_expression
+                left: (identifier)
+                right: (number)))))))))
+
+================================================================
+parens with commas build a site, and one expression is grouping
+================================================================
+
+p = (3, 4)
+g = (i + 1) * 2
+s = for I in space(A) { A[I + (0, 1)] }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (site
+      (number)
+      (number)))
+  (binding
+    name: (identifier)
+    value: (binary_expression
+      left: (parenthesized_expression
+        (binary_expression
+          left: (identifier)
+          right: (number)))
+      right: (number)))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)))
+      body: (body
+        (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (binary_expression
+                left: (identifier)
+                right: (site
+                  (number)
+                  (number))))))))))
+
+================================================================
+the lockstep bracket is a binder list, one binder per collection
+================================================================
+
+s = for [a, b] in [A, B] { a + b }
+d = for [x, y] in [0..10, 0..10] x * y
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier)
+        (identifier))
+      space: (list
+        (identifier)
+        (identifier))
+      body: (body
+        (binary_expression
+          left: (identifier)
+          right: (identifier)))))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier)
+        (identifier))
+      space: (list
+        (range_expression
+          left: (number)
+          right: (number))
+        (range_expression
+          left: (number)
+          right: (number)))
+      body: (binary_expression
+        left: (identifier)
+        right: (identifier)))))
+
+================================================================
+the brace after a comprehension's space is the body, and the item
+after the header still binds
+================================================================
+
+B = for (i, j) in [10, 10] { (i, j) }
+
+main = block {
+    B
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier)
+        (identifier))
+      space: (list
+        (number)
+        (number))
+      body: (body
+        (site
+          (identifier)
+          (identifier)))))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (identifier)))))
+
+================================================================
+a doc string stands alone as the document's first item
+================================================================
+
+"""
+# The chapter
+
+Prose about the document, with a "quote" and a \alpha kept raw.
+"""
+
+x = 1.0
+
+main = block {
+    text("ok")
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (doc_declaration
+    text: (triple_string
+      text: (triple_string_content)))
+  (binding
+    name: (identifier)
+    value: (number))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (string)))))))
+
+================================================================
+a triple-quoted literal is an ordinary string in expression position,
+and three quotes win over two
+================================================================
+
+note = """
+    indented prose
+    on two lines
+    """
+empty = ""
+blank = """"""
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (triple_string
+      text: (triple_string_content)))
+  (binding
+    name: (identifier)
+    value: (string))
+  (binding
+    name: (identifier)
+    value: (triple_string)))
+
+================================================================
+a product fiber: the declaration, the constructor and the projection
+================================================================
+
+fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)
+u = Cons(2.0, vec(1.0, 0.0), 3.0)
+d = u.D
+s = Cons(1.0, vec(1.0, 2.0), 3.0).S[1]
+p = (u + u).tau
+
+----------------------------------------------------------------
+
+(source_file
+  (fiber_declaration
+    name: (identifier)
+    component: (component
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier)))
+    component: (component
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier)
+        (fiber_type
+          name: (identifier))
+        (number)))
+    component: (component
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier))))
+  (binding
+    name: (identifier)
+    value: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (number)
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (number)
+            (number)))
+        (number))))
+  (binding
+    name: (identifier)
+    value: (qualified_identifier
+      namespace: (identifier)
+      name: (identifier)))
+  (binding
+    name: (identifier)
+    value: (index_expression
+      target: (projection_expression
+        target: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (number)
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (number)
+                (number)))
+            (number)))
+        name: (identifier))
+      index: (subscript
+        (selector
+          (number)))))
+  (binding
+    name: (identifier)
+    value: (projection_expression
+      target: (parenthesized_expression
+        (binary_expression
+          left: (identifier)
+          right: (identifier)))
+      name: (identifier))))
+
+================================================================
+a body declares its own transient port, and a top-level one takes `=`
+================================================================
+
+state seed = 0.0
+button(label) = block { state pos := none, text(label) } with hover(pos)
+w(k) = { state s := 0.0, s + k }
+rows = for i in 0..3 { state s := i, s }
+
+----------------------------------------------------------------
+
+(source_file
+  (port_declaration
+    name: (identifier)
+    value: (number))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)))
+    body: (with_expression
+      target: (payload_expression
+        target: (identifier)
+        body: (body
+          (state_local
+            name: (identifier)
+            value: (none))
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)))))
+      control: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)))))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)))
+    body: (body
+      (state_local
+        name: (identifier)
+        value: (number))
+      (binary_expression
+        left: (identifier)
+        right: (identifier))))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (range_expression
+        left: (number)
+        right: (number))
+      body: (body
+        (state_local
+          name: (identifier)
+          value: (identifier))
+        (identifier)))))
+
+================================================================
+a tap binds its gesture, and the bare form still stands
+================================================================
+
+fit = tap(g) : { hint: "fit" } { at <- g.at }
+half = tap(g) { i <- if g.at < 0.5 then 0 else 1 }
+plain = tap { n <- n + 1 }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (tap_expression
+      binder: (identifier)
+      config: (map
+        (map_entry
+          key: (identifier)
+          value: (string)))
+      body: (body
+        (write
+          target: (port_path
+            (identifier))
+          value: (qualified_identifier
+            namespace: (identifier)
+            name: (identifier))))))
+  (binding
+    name: (identifier)
+    value: (tap_expression
+      binder: (identifier)
+      body: (body
+        (write
+          target: (port_path
+            (identifier))
+          value: (conditional_expression
+            condition: (binary_expression
+              left: (qualified_identifier
+                namespace: (identifier)
+                name: (identifier))
+              right: (number))
+            consequence: (number)
+            alternative: (number))))))
+  (binding
+    name: (identifier)
+    value: (tap_expression
+      body: (body
+        (write
+          target: (port_path
+            (identifier))
+          value: (binary_expression
+            left: (identifier)
+            right: (number)))))))
+
+================================================================
+a product states its components in parens, and `but` replaces them
+================================================================
+
+w = (D: 4.0, S: 5.0)
+z = cam but (distance: 3.0)
+q = cam but (distance: d, focus: f) but (pose: p)
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (product
+      (product_component
+        name: (identifier)
+        value: (number))
+      (product_component
+        name: (identifier)
+        value: (number))))
+  (binding
+    name: (identifier)
+    value: (but_expression
+      target: (identifier)
+      override: (product
+        (product_component
+          name: (identifier)
+          value: (number)))))
+  (binding
+    name: (identifier)
+    value: (but_expression
+      target: (but_expression
+        target: (identifier)
+        override: (product
+          (product_component
+            name: (identifier)
+            value: (identifier))
+          (product_component
+            name: (identifier)
+            value: (identifier))))
+      override: (product
+        (product_component
+          name: (identifier)
+          value: (identifier))))))
+
+================================================================
+a parameter states its type, its default, or both
+================================================================
+
+nav(xr: Interval, yr: Interval) = xr
+recenter(cam: Camera, home: Vector<Real, 3>) = cam
+stepper(i: Int, at: Real|None, n) : { thickness: 28 } = i
+sheet(v: Array<Vector<Real, 3>, 2>, color: Color = c) = v
+sq(x) = x * x
+
+----------------------------------------------------------------
+
+(source_file
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier))))
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)))))
+    body: (identifier))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier))))
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)
+            (fiber_type
+              name: (identifier))
+            (number)))))
+    body: (identifier))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier))))
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier))
+          alternative: (fiber_type
+            name: (identifier))))
+      (parameter
+        name: (identifier)))
+    config: (map
+      (map_entry
+        key: (identifier)
+        value: (number)))
+    body: (identifier))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)
+            (fiber_type
+              name: (identifier)
+              (fiber_type
+                name: (identifier))
+              (number))
+            (number))))
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)))
+        default: (identifier)))
+    body: (identifier))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)))
+    body: (binary_expression
+      left: (identifier)
+      right: (identifier))))

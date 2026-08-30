@@ -1,0 +1,18 @@
+{
+  "grammars": [
+    {
+      "name": "cartan",
+      "camelcase": "Cartan",
+      "scope": "source.cartan",
+      "path": ".",
+      "file-types": ["cart"],
+      "injection-regex": "^(cartan|cart)$"
+    }
+  ],
+  "metadata": {
+    "version": "0.3.0",
+    "license": "MIT",
+    "description": "tree-sitter grammar for cartan documents (.cart)",
+    "authors": [{ "name": "cartan" }]
+  }
+}
