@@ -1255,3 +1255,146 @@ sq(x) = x * x
     body: (binary_expression
       left: (identifier)
       right: (identifier))))
+
+================================================================
+a comprehension's brace holds clauses, each a box and a body
+================================================================
+
+u = for (i, j) in space(g) {
+    in inner { step(g, i, j) }
+    in left { step(g, inward(i), j) }
+}
+d = for i in 0..n {
+    in [0..1] { 0.0 }
+    in [1..n] { u[i] - u[i - 1] }
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier)
+        (identifier))
+      space: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)))
+      body: (body
+        (clause
+          space: (identifier)
+          body: (body
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier)
+                (identifier)
+                (identifier)))))
+        (clause
+          space: (identifier)
+          body: (body
+            (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier)
+                (call_expression
+                  function: (identifier)
+                  arguments: (argument_list
+                    (identifier)))
+                (identifier))))))))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (range_expression
+        left: (number)
+        right: (identifier))
+      body: (body
+        (clause
+          space: (list
+            (range_expression
+              left: (number)
+              right: (number)))
+          body: (body
+            (number)))
+        (clause
+          space: (list
+            (range_expression
+              left: (number)
+              right: (identifier)))
+          body: (body
+            (binary_expression
+              left: (index_expression
+                target: (identifier)
+                index: (subscript
+                  (selector
+                    (identifier))))
+              right: (index_expression
+                target: (identifier)
+                index: (subscript
+                  (selector
+                    (binary_expression
+                      left: (identifier)
+                      right: (number))))))))))))
+
+================================================================
+a clause's body is braced or bare, as the header's body is
+================================================================
+
+u = for i in 0..n {
+    in 0..1 u0[0]
+    in 1..n - 1 { u0[i] + 1.0 }
+    in n - 1..n u0[n - 1]
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (range_expression
+        left: (number)
+        right: (identifier))
+      body: (body
+        (clause
+          space: (range_expression
+            left: (number)
+            right: (number))
+          body: (index_expression
+            target: (identifier)
+            index: (subscript
+              (selector
+                (number)))))
+        (clause
+          space: (range_expression
+            left: (number)
+            right: (binary_expression
+              left: (identifier)
+              right: (number)))
+          body: (body
+            (binary_expression
+              left: (index_expression
+                target: (identifier)
+                index: (subscript
+                  (selector
+                    (identifier))))
+              right: (number))))
+        (clause
+          space: (range_expression
+            left: (binary_expression
+              left: (identifier)
+              right: (number))
+            right: (identifier))
+          body: (index_expression
+            target: (identifier)
+            index: (subscript
+              (selector
+                (binary_expression
+                  left: (identifier)
+                  right: (number))))))))))

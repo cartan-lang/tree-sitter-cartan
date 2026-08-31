@@ -36,6 +36,7 @@ module.exports = grammar({
   conflicts: ($) => [
     [$._expression, $.for_expression],
     [$._expression, $.each_expression],
+    [$._expression, $.clause],
     [$._config_atom, $._expression],
     [$.port_path, $.qualified_identifier],
   ],
@@ -1149,17 +1150,35 @@ module.exports = grammar({
         repeat(choice(",", $._newline)),
         optional(
           seq(
-            choice($.local, $.state_local, $.write, $._expression),
+            choice($.local, $.state_local, $.write, $.clause, $._expression),
             repeat(
               seq(
                 repeat1(choice(",", $._newline)),
-                choice($.local, $.state_local, $.write, $._expression),
+                choice($.local, $.state_local, $.write, $.clause, $._expression),
               ),
             ),
             repeat(choice(",", $._newline)),
           ),
         ),
         "}",
+      ),
+
+    // `in <box> { … }` and `in <box> value` — one piece of a clause
+    // comprehension (R:clause-comprehension). It is a body item, and
+    // the parser holds it to a brace directly under a `for` header;
+    // the box is read in the header's own zone rule, so the brace
+    // after it is the clause's body rather than a payload on the box.
+    // The body is braced or bare under the rule the header's body
+    // takes, and `in` opens the next clause.
+    clause: ($) =>
+      seq(
+        "in",
+        repeat($._newline),
+        field("space", $._expression_1),
+        choice(
+          prec.dynamic(2, field("body", $.body)),
+          prec.dynamic(1, field("body", $._expression)),
+        ),
       ),
 
     local: ($) =>

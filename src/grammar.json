@@ -4646,6 +4646,10 @@
                     },
                     {
                       "type": "SYMBOL",
+                      "name": "clause"
+                    },
+                    {
+                      "type": "SYMBOL",
                       "name": "_expression"
                     }
                   ]
@@ -4688,6 +4692,10 @@
                           },
                           {
                             "type": "SYMBOL",
+                            "name": "clause"
+                          },
+                          {
+                            "type": "SYMBOL",
                             "name": "_expression"
                           }
                         ]
@@ -4721,6 +4729,59 @@
         {
           "type": "STRING",
           "value": "}"
+        }
+      ]
+    },
+    "clause": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "in"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_newline"
+          }
+        },
+        {
+          "type": "FIELD",
+          "name": "space",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_expression_1"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PREC_DYNAMIC",
+              "value": 2,
+              "content": {
+                "type": "FIELD",
+                "name": "body",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "body"
+                }
+              }
+            },
+            {
+              "type": "PREC_DYNAMIC",
+              "value": 1,
+              "content": {
+                "type": "FIELD",
+                "name": "body",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
+              }
+            }
+          ]
         }
       ]
     },
@@ -5045,6 +5106,10 @@
     [
       "_expression",
       "each_expression"
+    ],
+    [
+      "_expression",
+      "clause"
     ],
     [
       "_config_atom",
