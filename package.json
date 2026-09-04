@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-cartan",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "tree-sitter grammar for cartan documents (.cart)",
   "license": "MIT",
   "main": "bindings/node",
