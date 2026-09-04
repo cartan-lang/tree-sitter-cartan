@@ -32,6 +32,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -68,6 +72,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -85,10 +93,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -200,6 +204,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -232,6 +240,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -245,10 +257,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -287,7 +295,7 @@
       },
       "period": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "absent_expression",
@@ -311,6 +319,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -346,6 +358,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -359,10 +375,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -445,6 +457,10 @@
           "named": true
         },
         {
+          "type": "component_expression",
+          "named": true
+        },
+        {
           "type": "conditional_expression",
           "named": true
         },
@@ -481,6 +497,10 @@
           "named": true
         },
         {
+          "type": "match_expression",
+          "named": true
+        },
+        {
           "type": "none",
           "named": true
         },
@@ -498,10 +518,6 @@
         },
         {
           "type": "product",
-          "named": true
-        },
-        {
-          "type": "projection_expression",
           "named": true
         },
         {
@@ -572,6 +588,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -608,6 +628,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -625,10 +649,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -756,6 +776,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -792,6 +816,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -809,10 +837,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -857,10 +881,22 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
+          "type": "constructor_pattern",
+          "named": true
+        },
+        {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "named_pattern",
+          "named": true
+        },
+        {
+          "type": "site_pattern",
           "named": true
         }
       ]
@@ -876,6 +912,16 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_annotation",
             "named": true
           }
         ]
@@ -906,6 +952,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -945,6 +995,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -962,10 +1016,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -1041,6 +1091,10 @@
           "named": true
         },
         {
+          "type": "component_expression",
+          "named": true
+        },
+        {
           "type": "conditional_expression",
           "named": true
         },
@@ -1081,6 +1135,10 @@
           "named": true
         },
         {
+          "type": "match_expression",
+          "named": true
+        },
+        {
           "type": "none",
           "named": true
         },
@@ -1098,10 +1156,6 @@
         },
         {
           "type": "product",
-          "named": true
-        },
-        {
-          "type": "projection_expression",
           "named": true
         },
         {
@@ -1185,6 +1239,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -1221,6 +1279,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -1238,10 +1300,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -1307,6 +1365,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -1343,6 +1405,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -1360,10 +1426,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -1408,7 +1470,7 @@
     "fields": {
       "arguments": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "argument_list",
@@ -1416,9 +1478,19 @@
           }
         ]
       },
+      "described": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "described_head",
+            "named": true
+          }
+        ]
+      },
       "function": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "identifier",
@@ -1436,6 +1508,16 @@
         "types": [
           {
             "type": "primes",
+            "named": true
+          }
+        ]
+      },
+      "variants": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "variant_arguments",
             "named": true
           }
         ]
@@ -1475,6 +1557,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -1511,6 +1597,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -1528,10 +1618,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -1597,6 +1683,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -1629,6 +1719,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -1642,10 +1736,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -1711,10 +1801,20 @@
     }
   },
   {
-    "type": "conditional_expression",
+    "type": "component_expression",
     "named": true,
     "fields": {
-      "alternative": {
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "component_key",
+            "named": true
+          }
+        ]
+      },
+      "value": {
         "multiple": false,
         "required": true,
         "types": [
@@ -1740,6 +1840,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -1779,6 +1883,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -1799,7 +1907,154 @@
             "named": true
           },
           {
-            "type": "projection_expression",
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "component_key",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "conditional_expression",
+    "named": true,
+    "fields": {
+      "alternative": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "product",
             "named": true
           },
           {
@@ -1865,6 +2120,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -1901,6 +2160,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -1918,10 +2181,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -1987,6 +2246,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -2023,6 +2286,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -2040,10 +2307,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -2145,6 +2408,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -2181,6 +2448,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -2198,10 +2469,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -2234,6 +2501,80 @@
           },
           {
             "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "constructor_pattern",
+    "named": true,
+    "fields": {
+      "described": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "described_head",
+            "named": true
+          }
+        ]
+      },
+      "head": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "constructor_pattern",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "named_pattern",
+          "named": true
+        },
+        {
+          "type": "site_pattern",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "described_head",
+    "named": true,
+    "fields": {
+      "component": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "component",
+            "named": true
+          }
+        ]
+      },
+      "variant": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "variant",
             "named": true
           }
         ]
@@ -2299,6 +2640,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -2335,6 +2680,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -2352,10 +2701,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -2421,6 +2766,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -2453,6 +2802,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -2469,7 +2822,135 @@
             "named": true
           },
           {
-            "type": "projection_expression",
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "else_arm",
+    "named": true,
+    "fields": {
+      "body": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "product",
             "named": true
           },
           {
@@ -2531,6 +3012,16 @@
             "named": true
           }
         ]
+      },
+      "variant": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "variant",
+            "named": true
+          }
+        ]
       }
     }
   },
@@ -2554,6 +3045,16 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "variant": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "variant",
             "named": true
           }
         ]
@@ -2657,6 +3158,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -2689,6 +3194,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -2702,10 +3211,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -2781,6 +3286,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -2813,6 +3322,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -2826,10 +3339,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -2909,6 +3418,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -2941,6 +3454,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -2954,10 +3471,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -3039,6 +3552,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -3075,6 +3592,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -3092,10 +3613,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -3161,6 +3678,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -3193,6 +3714,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -3206,10 +3731,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -3281,6 +3802,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -3317,6 +3842,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -3334,10 +3863,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -3449,6 +3974,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -3485,6 +4014,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -3502,10 +4035,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -3577,6 +4106,10 @@
           "named": true
         },
         {
+          "type": "component_expression",
+          "named": true
+        },
+        {
           "type": "conditional_expression",
           "named": true
         },
@@ -3613,6 +4146,10 @@
           "named": true
         },
         {
+          "type": "match_expression",
+          "named": true
+        },
+        {
           "type": "none",
           "named": true
         },
@@ -3630,10 +4167,6 @@
         },
         {
           "type": "product",
-          "named": true
-        },
-        {
-          "type": "projection_expression",
           "named": true
         },
         {
@@ -3675,12 +4208,34 @@
     "type": "local",
     "named": true,
     "fields": {
-      "name": {
+      "pattern": {
         "multiple": false,
         "required": true,
         "types": [
           {
+            "type": "constructor_pattern",
+            "named": true
+          },
+          {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "named_pattern",
+            "named": true
+          },
+          {
+            "type": "site_pattern",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_annotation",
             "named": true
           }
         ]
@@ -3711,6 +4266,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -3750,6 +4309,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -3767,10 +4330,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -3867,6 +4426,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -3903,6 +4466,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -3920,10 +4487,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -3963,12 +4526,12 @@
     }
   },
   {
-    "type": "parameter",
+    "type": "match_arm",
     "named": true,
     "fields": {
-      "default": {
+      "body": {
         "multiple": false,
-        "required": false,
+        "required": true,
         "types": [
           {
             "type": "absent_expression",
@@ -3992,6 +4555,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -4031,6 +4598,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -4051,7 +4622,372 @@
             "named": true
           },
           {
-            "type": "projection_expression",
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      },
+      "pattern": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "constructor_pattern",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "named_pattern",
+            "named": true
+          },
+          {
+            "type": "site_pattern",
+            "named": true
+          }
+        ]
+      },
+      "variant": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "named_sub_pattern",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "match_expression",
+    "named": true,
+    "fields": {
+      "scrutinee": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "else_arm",
+          "named": true
+        },
+        {
+          "type": "match_arm",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "named_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "named_sub_pattern",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "named_sub_pattern",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          }
+        ]
+      },
+      "pattern": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "constructor_pattern",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "named_pattern",
+            "named": true
+          },
+          {
+            "type": "site_pattern",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "parameter",
+    "named": true,
+    "fields": {
+      "default": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "product",
             "named": true
           },
           {
@@ -4093,7 +5029,19 @@
         "required": true,
         "types": [
           {
+            "type": "constructor_pattern",
+            "named": true
+          },
+          {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "named_pattern",
+            "named": true
+          },
+          {
+            "type": "site_pattern",
             "named": true
           }
         ]
@@ -4158,6 +5106,10 @@
           "named": true
         },
         {
+          "type": "component_expression",
+          "named": true
+        },
+        {
           "type": "conditional_expression",
           "named": true
         },
@@ -4194,6 +5146,10 @@
           "named": true
         },
         {
+          "type": "match_expression",
+          "named": true
+        },
+        {
           "type": "none",
           "named": true
         },
@@ -4211,10 +5167,6 @@
         },
         {
           "type": "product",
-          "named": true
-        },
-        {
-          "type": "projection_expression",
           "named": true
         },
         {
@@ -4250,6 +5202,152 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "pattern_binding",
+    "named": true,
+    "fields": {
+      "pattern": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "named_pattern",
+            "named": true
+          },
+          {
+            "type": "site_pattern",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -4295,6 +5393,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -4331,6 +5433,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -4348,10 +5454,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -4418,6 +5520,16 @@
           }
         ]
       },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_annotation",
+            "named": true
+          }
+        ]
+      },
       "value": {
         "multiple": false,
         "required": true,
@@ -4444,6 +5556,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -4483,6 +5599,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -4500,10 +5620,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -4540,21 +5656,6 @@
           }
         ]
       }
-    }
-  },
-  {
-    "type": "port_path",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "identifier",
-          "named": true
-        }
-      ]
     }
   },
   {
@@ -4583,6 +5684,14 @@
           {
             "type": "identifier",
             "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
           }
         ]
       },
@@ -4612,6 +5721,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -4651,6 +5764,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -4668,10 +5785,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -4704,48 +5817,6 @@
           },
           {
             "type": "with_expression",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "projection_expression",
-    "named": true,
-    "fields": {
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
-      "target": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "absent_expression",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "index_expression",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           }
         ]
@@ -4811,6 +5882,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -4847,6 +5922,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -4864,10 +5943,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -4947,6 +6022,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -4983,6 +6062,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -5000,10 +6083,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -5075,6 +6154,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -5111,6 +6194,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -5128,10 +6215,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -5211,6 +6294,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -5247,6 +6334,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -5264,10 +6355,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -5334,6 +6421,10 @@
           "named": true
         },
         {
+          "type": "component_expression",
+          "named": true
+        },
+        {
           "type": "conditional_expression",
           "named": true
         },
@@ -5370,6 +6461,10 @@
           "named": true
         },
         {
+          "type": "match_expression",
+          "named": true
+        },
+        {
           "type": "none",
           "named": true
         },
@@ -5387,10 +6482,6 @@
         },
         {
           "type": "product",
-          "named": true
-        },
-        {
-          "type": "projection_expression",
           "named": true
         },
         {
@@ -5461,6 +6552,10 @@
           "named": true
         },
         {
+          "type": "component_expression",
+          "named": true
+        },
+        {
           "type": "conditional_expression",
           "named": true
         },
@@ -5497,6 +6592,10 @@
           "named": true
         },
         {
+          "type": "match_expression",
+          "named": true
+        },
+        {
           "type": "none",
           "named": true
         },
@@ -5514,10 +6613,6 @@
         },
         {
           "type": "product",
-          "named": true
-        },
-        {
-          "type": "projection_expression",
           "named": true
         },
         {
@@ -5556,6 +6651,33 @@
     }
   },
   {
+    "type": "site_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "constructor_pattern",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "named_pattern",
+          "named": true
+        },
+        {
+          "type": "site_pattern",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "source_file",
     "named": true,
     "root": true,
@@ -5585,6 +6707,10 @@
           "named": true
         },
         {
+          "type": "pattern_binding",
+          "named": true
+        },
+        {
           "type": "port_declaration",
           "named": true
         },
@@ -5605,6 +6731,16 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "type_annotation",
             "named": true
           }
         ]
@@ -5635,6 +6771,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -5674,6 +6814,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -5691,10 +6835,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -5757,7 +6897,19 @@
         "required": false,
         "types": [
           {
+            "type": "constructor_pattern",
+            "named": true
+          },
+          {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "named_pattern",
+            "named": true
+          },
+          {
+            "type": "site_pattern",
             "named": true
           }
         ]
@@ -5879,6 +7031,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -5915,6 +7071,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -5932,10 +7092,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -6019,10 +7175,46 @@
     }
   },
   {
-    "type": "with_expression",
+    "type": "variant",
     "named": true,
     "fields": {
-      "control": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "fiber_type",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "variant_argument",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "value": {
         "multiple": false,
         "required": true,
         "types": [
@@ -6048,6 +7240,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -6087,6 +7283,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -6107,7 +7307,150 @@
             "named": true
           },
           {
-            "type": "projection_expression",
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "variant_arguments",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "variant_argument",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "with_expression",
+    "named": true,
+    "fields": {
+      "control": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "product",
             "named": true
           },
           {
@@ -6173,6 +7516,10 @@
             "named": true
           },
           {
+            "type": "component_expression",
+            "named": true
+          },
+          {
             "type": "conditional_expression",
             "named": true
           },
@@ -6209,6 +7556,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -6226,10 +7577,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -6277,7 +7624,7 @@
         "required": true,
         "types": [
           {
-            "type": "port_path",
+            "type": "identifier",
             "named": true
           }
         ]
@@ -6308,6 +7655,10 @@
           },
           {
             "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
             "named": true
           },
           {
@@ -6347,6 +7698,10 @@
             "named": true
           },
           {
+            "type": "match_expression",
+            "named": true
+          },
+          {
             "type": "none",
             "named": true
           },
@@ -6364,10 +7719,6 @@
           },
           {
             "type": "product",
-            "named": true
-          },
-          {
-            "type": "projection_expression",
             "named": true
           },
           {
@@ -6572,6 +7923,10 @@
     "named": true
   },
   {
+    "type": "match",
+    "named": false
+  },
+  {
     "type": "none",
     "named": true
   },
@@ -6582,6 +7937,10 @@
   {
     "type": "number",
     "named": true
+  },
+  {
+    "type": "of",
+    "named": false
   },
   {
     "type": "or",

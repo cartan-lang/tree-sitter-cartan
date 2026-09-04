@@ -63,8 +63,7 @@ with tap {
       control: (tap_expression
         body: (body
           (write
-            target: (port_path
-              (identifier))
+            target: (identifier)
             value: (call_expression
               function: (identifier)
               arguments: (argument_list
@@ -74,8 +73,7 @@ with tap {
                     (identifier)))
                 (number))))
           (write
-            target: (port_path
-              (identifier))
+            target: (identifier)
             value: (call_expression
               function: (identifier)
               arguments: (argument_list
@@ -103,11 +101,51 @@ every 1.0 / 30.0 while time < 120.0 { time <- time + 1.0 }
       right: (number))
     body: (body
       (write
-        target: (port_path
-          (identifier))
+        target: (identifier)
         value: (binary_expression
           left: (identifier)
           right: (number))))))
+
+================================================================
+a free-running agent states a guard and no period
+================================================================
+
+while running { n <- n + 1 }
+
+----------------------------------------------------------------
+
+(source_file
+  (agent
+    guard: (identifier)
+    body: (body
+      (write
+        target: (identifier)
+        value: (binary_expression
+          left: (identifier)
+          right: (number))))))
+
+================================================================
+while true is the free-running form that states no guard of its own
+================================================================
+
+while true : { precision: "f64" } { u <- step(u) }
+
+----------------------------------------------------------------
+
+(source_file
+  (agent
+    guard: (boolean)
+    config: (map
+      (map_entry
+        key: (identifier)
+        value: (string)))
+    body: (body
+      (write
+        target: (identifier)
+        value: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))))))
 
 ================================================================
 main is a binding of a configured block, its rows one per line
@@ -264,7 +302,7 @@ v = { n := 4, linspace(0.0, 1.0, n) }
     name: (identifier)
     value: (body
       (local
-        name: (identifier)
+        pattern: (identifier)
         value: (number))
       (call_expression
         function: (identifier)
@@ -424,8 +462,7 @@ main = block {
           control: (tap_expression
             body: (body
               (write
-                target: (port_path
-                  (identifier))
+                target: (identifier)
                 value: (unary_expression
                   operand: (identifier))))))))))
 
@@ -447,8 +484,7 @@ reset = tap : { hint: "reset" } { cr <- extent(f) }
           value: (string)))
       body: (body
         (write
-          target: (port_path
-            (identifier))
+          target: (identifier)
           value: (call_expression
             function: (identifier)
             arguments: (argument_list
@@ -599,8 +635,9 @@ o = for (i, j) in [0..10, 0..10] { xw[i] * yw[j] }
     name: (identifier)
     value: (for_expression
       binders: (binder_list
-        (identifier)
-        (identifier))
+        (site_pattern
+          (identifier)
+          (identifier)))
       space: (list
         (range_expression
           left: (number)
@@ -850,8 +887,9 @@ main = block {
     name: (identifier)
     value: (for_expression
       binders: (binder_list
-        (identifier)
-        (identifier))
+        (site_pattern
+          (identifier)
+          (identifier)))
       space: (list
         (number)
         (number))
@@ -928,14 +966,19 @@ blank = """"""
     value: (triple_string)))
 
 ================================================================
-a product fiber: the declaration, the constructor and the projection
+a product fiber: the declaration, the constructor and the component read
 ================================================================
 
 fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)
 u = Cons(2.0, vec(1.0, 0.0), 3.0)
-d = u.D
-s = Cons(1.0, vec(1.0, 2.0), 3.0).S[1]
-p = (u + u).tau
+d = D of u
+s = 1 of S of Cons(1.0, vec(1.0, 2.0), 3.0)
+p = tau of (u + u)
+q = (0, 1) of m
+w = u but (tau: 4.0)
+v = vec(1.0, 2.0) but (0: 9.0)
+(0: x) = v
+main = [d, s, p, q, w, x]
 
 ----------------------------------------------------------------
 
@@ -971,14 +1014,19 @@ p = (u + u).tau
         (number))))
   (binding
     name: (identifier)
-    value: (qualified_identifier
-      namespace: (identifier)
-      name: (identifier)))
+    value: (component_expression
+      key: (component_key
+        (identifier))
+      value: (identifier)))
   (binding
     name: (identifier)
-    value: (index_expression
-      target: (projection_expression
-        target: (call_expression
+    value: (component_expression
+      key: (component_key
+        (number))
+      value: (component_expression
+        key: (component_key
+          (identifier))
+        value: (call_expression
           function: (identifier)
           arguments: (argument_list
             (number)
@@ -987,19 +1035,58 @@ p = (u + u).tau
               arguments: (argument_list
                 (number)
                 (number)))
-            (number)))
-        name: (identifier))
-      index: (subscript
-        (selector
-          (number)))))
+            (number))))))
   (binding
     name: (identifier)
-    value: (projection_expression
-      target: (parenthesized_expression
+    value: (component_expression
+      key: (component_key
+        (identifier))
+      value: (parenthesized_expression
         (binary_expression
           left: (identifier)
-          right: (identifier)))
-      name: (identifier))))
+          right: (identifier)))))
+  (binding
+    name: (identifier)
+    value: (component_expression
+      key: (component_key
+        (number)
+        (number))
+      value: (identifier)))
+  (binding
+    name: (identifier)
+    value: (but_expression
+      target: (identifier)
+      override: (product
+        (product_component
+          name: (identifier)
+          value: (number)))))
+  (binding
+    name: (identifier)
+    value: (but_expression
+      target: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (number)
+          (number)))
+      override: (product
+        (product_component
+          name: (number)
+          value: (number)))))
+  (pattern_binding
+    pattern: (named_pattern
+      (named_sub_pattern
+        name: (number)
+        pattern: (identifier)))
+    value: (identifier))
+  (binding
+    name: (identifier)
+    value: (list
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier)
+      (identifier))))
 
 ================================================================
 a body declares its own transient port, and a top-level one takes `=`
@@ -1083,8 +1170,7 @@ plain = tap { n <- n + 1 }
           value: (string)))
       body: (body
         (write
-          target: (port_path
-            (identifier))
+          target: (identifier)
           value: (qualified_identifier
             namespace: (identifier)
             name: (identifier))))))
@@ -1094,8 +1180,7 @@ plain = tap { n <- n + 1 }
       binder: (identifier)
       body: (body
         (write
-          target: (port_path
-            (identifier))
+          target: (identifier)
           value: (conditional_expression
             condition: (binary_expression
               left: (qualified_identifier
@@ -1109,8 +1194,7 @@ plain = tap { n <- n + 1 }
     value: (tap_expression
       body: (body
         (write
-          target: (port_path
-            (identifier))
+          target: (identifier)
           value: (binary_expression
             left: (identifier)
             right: (number)))))))
@@ -1158,6 +1242,59 @@ q = cam but (distance: d, focus: f) but (pose: p)
       override: (product
         (product_component
           name: (identifier)
+          value: (identifier))))))
+
+================================================================
+a site in key position writes one sample of a field
+================================================================
+
+b = g but ((ti, tj): 1 - g[ti, tj])
+c = A but ((1, 2): 20.0, (k, l): 5.0)
+d = a but (3: v)
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (but_expression
+      target: (identifier)
+      override: (product
+        (product_component
+          name: (site
+            (identifier)
+            (identifier))
+          value: (binary_expression
+            left: (number)
+            right: (index_expression
+              target: (identifier)
+              index: (subscript
+                (selector
+                  (identifier))
+                (selector
+                  (identifier)))))))))
+  (binding
+    name: (identifier)
+    value: (but_expression
+      target: (identifier)
+      override: (product
+        (product_component
+          name: (site
+            (number)
+            (number))
+          value: (number))
+        (product_component
+          name: (site
+            (identifier)
+            (identifier))
+          value: (number)))))
+  (binding
+    name: (identifier)
+    value: (but_expression
+      target: (identifier)
+      override: (product
+        (product_component
+          name: (number)
           value: (identifier))))))
 
 ================================================================
@@ -1276,8 +1413,9 @@ d = for i in 0..n {
     name: (identifier)
     value: (for_expression
       binders: (binder_list
-        (identifier)
-        (identifier))
+        (site_pattern
+          (identifier)
+          (identifier)))
       space: (call_expression
         function: (identifier)
         arguments: (argument_list
@@ -1398,3 +1536,287 @@ u = for i in 0..n {
                 (binary_expression
                   left: (identifier)
                   right: (number))))))))))
+
+================================================================
+every binding site states an optional fiber, and a description heads a constructor
+================================================================
+
+a: Real = 3
+port x: Vector<Real, 2>|None = vec(0, 0)
+state n: Int = 0
+u = (D: Real, E: Real)(1, 0)
+z = block {
+    c: Real := 2
+    state d: Int := 0
+    (D: Real, E: Real)(p, q) := u
+    c
+}
+
+-----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (identifier)))
+    value: (number))
+  (port_declaration
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (identifier)
+        (fiber_type
+          name: (identifier))
+        (number))
+      alternative: (fiber_type
+        name: (identifier)))
+    value: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (number)
+        (number))))
+  (port_declaration
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (identifier)))
+    value: (number))
+  (binding
+    name: (identifier)
+    value: (call_expression
+      described: (described_head
+        component: (component
+          name: (identifier)
+          type: (fiber_type
+            name: (identifier)))
+        component: (component
+          name: (identifier)
+          type: (fiber_type
+            name: (identifier))))
+      arguments: (argument_list
+        (number)
+        (number))))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (local
+          pattern: (identifier)
+          type: (type_annotation
+            (fiber_type
+              name: (identifier)))
+          value: (number))
+        (state_local
+          name: (identifier)
+          type: (type_annotation
+            (fiber_type
+              name: (identifier)))
+          value: (number))
+        (local
+          pattern: (constructor_pattern
+            described: (described_head
+              component: (component
+                name: (identifier)
+                type: (fiber_type
+                  name: (identifier)))
+              component: (component
+                name: (identifier)
+                type: (fiber_type
+                  name: (identifier))))
+            (identifier)
+            (identifier))
+          value: (identifier))
+        (identifier)))))
+
+================================================================
+a sum fiber: the declaration, the constructor and the match
+================================================================
+
+fiber Cell = (Fluid: Vector<Real, 2> | Vacuum: Real)
+s = Cell(Vacuum: 1.5)
+t = (Fluid: Vector<Real, 2> | Vacuum: Real)(Fluid: vec(1.0, 2.0))
+a = match s {
+    Fluid(v) then norm(v)
+    Vacuum(x) then x
+}
+b = match t {
+    Fluid(0: bx, 1: by) then bx + by
+    else 0.0
+}
+main = [a, b]
+
+----------------------------------------------------------------
+
+(source_file
+  (fiber_declaration
+    name: (identifier)
+    variant: (variant
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier)
+        (fiber_type
+          name: (identifier))
+        (number)))
+    variant: (variant
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier))))
+  (binding
+    name: (identifier)
+    value: (call_expression
+      function: (identifier)
+      variants: (variant_arguments
+        (variant_argument
+          name: (identifier)
+          value: (number)))))
+  (binding
+    name: (identifier)
+    value: (call_expression
+      described: (described_head
+        variant: (variant
+          name: (identifier)
+          type: (fiber_type
+            name: (identifier)
+            (fiber_type
+              name: (identifier))
+            (number)))
+        variant: (variant
+          name: (identifier)
+          type: (fiber_type
+            name: (identifier))))
+      variants: (variant_arguments
+        (variant_argument
+          name: (identifier)
+          value: (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (number)
+              (number)))))))
+  (binding
+    name: (identifier)
+    value: (match_expression
+      scrutinee: (identifier)
+      (match_arm
+        variant: (identifier)
+        pattern: (identifier)
+        body: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier))))
+      (match_arm
+        variant: (identifier)
+        pattern: (identifier)
+        body: (identifier))))
+  (binding
+    name: (identifier)
+    value: (match_expression
+      scrutinee: (identifier)
+      (match_arm
+        variant: (identifier)
+        (named_sub_pattern
+          name: (number)
+          pattern: (identifier))
+        (named_sub_pattern
+          name: (number)
+          pattern: (identifier))
+        body: (binary_expression
+          left: (identifier)
+          right: (identifier)))
+      (else_arm
+        body: (number))))
+  (binding
+    name: (identifier)
+    value: (list
+      (identifier)
+      (identifier))))
+
+
+================================================================
+a positional pattern under a stated fiber, at a parameter and a local
+================================================================
+
+fiber Prim = (rho: Real, v: Real, p: Real)
+sound((rho, _, p): Prim) = sqrt(p / rho)
+head(u) = {
+    (d, s, e): Prim := u
+    d + s + e
+}
+main = [sound(Prim(1.0, 0.0, 2.0)), head(Prim(1.0, 2.0, 3.0))]
+
+----------------------------------------------------------------
+
+(source_file
+  (fiber_declaration
+    name: (identifier)
+    component: (component
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier)))
+    component: (component
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier)))
+    component: (component
+      name: (identifier)
+      type: (fiber_type
+        name: (identifier))))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (site_pattern
+          (identifier)
+          (identifier)
+          (identifier))
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)))))
+    body: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (binary_expression
+          left: (identifier)
+          right: (identifier)))))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)))
+    body: (body
+      (local
+        pattern: (site_pattern
+          (identifier)
+          (identifier)
+          (identifier))
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)))
+        value: (identifier))
+      (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (identifier))))
+  (binding
+    name: (identifier)
+    value: (list
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (number)
+              (number)
+              (number)))))
+      (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (number)
+              (number)
+              (number))))))))

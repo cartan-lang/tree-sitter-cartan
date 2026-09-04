@@ -38,7 +38,12 @@ module.exports = grammar({
     [$._expression, $.each_expression],
     [$._expression, $.clause],
     [$._config_atom, $._expression],
-    [$.port_path, $.qualified_identifier],
+    [$._expression, $._pattern],
+    [$._expression, $.component_key],
+    [$.fiber_type, $._pattern],
+    [$.fiber_type, $._expression],
+    [$.fiber_type, $._expression, $._pattern],
+    [$.component, $.variant],
   ],
 
   rules: {
@@ -68,6 +73,7 @@ module.exports = grammar({
         $.port_declaration,
         $.fiber_declaration,
         $.agent,
+        $.pattern_binding,
         $.function_definition,
         $.binding,
       ),
@@ -88,52 +94,99 @@ module.exports = grammar({
       ),
 
     // `port name = expr` / `state name = expr` — every port holds an
-    // initial (axiom A2).
+    // initial (axiom A2). A port states an optional fiber after `:`,
+    // `port x: Vector<Real, 2>|None = vec(0, 0)`, and the initial is
+    // held to it (R:stated-fiber).
     port_declaration: ($) =>
       seq(
         field("kind", choice("port", "state")),
         field("name", $.identifier),
+        optional(seq(":", field("type", $.type_annotation))),
         "=",
         repeat($._newline),
         field("value", $._expression),
       ),
 
-    // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)` — a
-    // product fiber declaration (R:product-fiber): the components in
-    // declared order, each a name and a fiber type, inside the named
-    // parens the value form already uses. At least one component, and
-    // no name twice, which the lowering states.
+    // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)` and
+    // `fiber Shape = (A: Real | B: Vector<Real, 3>)` — a fiber
+    // declaration: a product's components separated by `,`
+    // (R:product-fiber) or a sum's variants separated by `|`
+    // (R:sum-fiber), each a name and a fiber type, inside the named
+    // parens the value form already uses. A product states at least
+    // one component and a sum at least two variants, and no name
+    // twice, which the lowering states.
     fiber_declaration: ($) =>
       seq(
         "fiber",
         field("name", $.identifier),
         "=",
-        "(",
-        repeat(choice(",", $._newline)),
-        optional(
+        choice(
           seq(
-            field("component", $.component),
-            repeat(
+            "(",
+            field("variant", $.variant),
+            repeat1(
               seq(
-                repeat1(choice(",", $._newline)),
-                field("component", $.component),
+                repeat($._newline),
+                "|",
+                repeat($._newline),
+                field("variant", $.variant),
               ),
             ),
+            ")",
+          ),
+          seq(
+            "(",
             repeat(choice(",", $._newline)),
+            optional(
+              seq(
+                field("component", $.component),
+                repeat(
+                  seq(
+                    repeat1(choice(",", $._newline)),
+                    field("component", $.component),
+                  ),
+                ),
+                repeat(choice(",", $._newline)),
+              ),
+            ),
+            ")",
           ),
         ),
-        ")",
       ),
 
     component: ($) =>
       seq(field("name", $.identifier), ":", field("type", $.fiber_type)),
 
+    // `A: Real` — one variant of a sum fiber (R:sum-fiber): its name
+    // and the fiber its payload takes. Every variant states a
+    // payload.
+    variant: ($) =>
+      seq(field("name", $.identifier), ":", field("type", $.fiber_type)),
+
     // A fiber type: a name with optional `<…>` arguments, types or
     // widths — `Real`, `Vector<Real, 2>`, `Site<3>` — or a product's
-    // components stated in the open, which stands wherever an alias
-    // does (R:product-fiber).
+    // components or a sum's variants stated in the open, either of
+    // which stands wherever an alias does (R:product-fiber,
+    // R:sum-fiber). The lookahead before the components is the
+    // interpreter's alone, as `described_head`'s is: a `component`
+    // states its own sentence for a missing `:`, and the parenthesized
+    // description is one of three readings of a paren, so the sentence
+    // waits until the colon says the reading is this one.
     fiber_type: ($) =>
       choice(
+        seq(
+          "(",
+          field("variant", $.variant),
+          repeat1(
+            seq(
+              repeat($._newline),
+              "|",
+              repeat($._newline),
+              field("variant", $.variant),
+            ),
+          ),
+          ")",
+        ),
         seq(
           "(",
           repeat(choice(",", $._newline)),
@@ -175,9 +228,27 @@ module.exports = grammar({
         ),
       ),
 
+    // `name = expr`, and `name: Real = expr` where the binding states
+    // the fiber its value takes (R:stated-fiber).
     binding: ($) =>
       seq(
         field("name", $.identifier),
+        optional(seq(":", field("type", $.type_annotation))),
+        "=",
+        repeat($._newline),
+        field("value", $._expression),
+      ),
+
+    // `(D: D) = U` and `(i, j) = s` — a top-level pattern item
+    // (spec §4, §2.10): each name the pattern binds is a document name
+    // holding that component, and a field of products binds its
+    // component fields. The parenthesized patterns open where no other
+    // item does. The constructor form `Cons(D, S, tau) = U` is written
+    // the way a function definition is, and elaboration tells the two
+    // apart by what the head names.
+    pattern_binding: ($) =>
+      seq(
+        field("pattern", choice($.named_pattern, $.site_pattern)),
         "=",
         repeat($._newline),
         field("value", $._expression),
@@ -210,14 +281,16 @@ module.exports = grammar({
         ")",
       ),
 
-    // `xr: Interval`, `at: Real|None`, `color: Color = hex("#56b6c2")` —
-    // a parameter states an optional type and an optional default,
-    // independently of each other (wishlist item 71). That only a
-    // trailing run declares defaults, and that `None` is the one
+    // `xr: Interval`, `at: Real|None`, `color: Color = hex("#56b6c2")`,
+    // `Cons(d, s, _)` — a parameter binds a pattern and states an
+    // optional type and an optional default, independently of each
+    // other (wishlist item 71). The annotation and the default stand on
+    // the whole slot. That only a trailing run declares defaults, that a
+    // default stands on a bare name, and that `None` is the one
     // alternative an annotation takes, the lowering states.
     parameter: ($) =>
       seq(
-        field("name", $.identifier),
+        field("name", $._pattern),
         optional(seq(":", field("type", $.type_annotation))),
         optional(seq("=", repeat($._newline), field("default", $._expression))),
       ),
@@ -225,33 +298,51 @@ module.exports = grammar({
     type_annotation: ($) =>
       seq($.fiber_type, optional(seq("|", field("alternative", $.fiber_type)))),
 
-    // `every P (while G)? (: config)* { p <- e, … }` — an agent (spec §5).
-    // The brace outranks the payload zone: an `every` header bars a
-    // juxtaposed brace, so the brace is the agent's writes and never
-    // `P`'s payload (spec §2.3), and the `:` after the header is the
-    // agent's configuration, `: { precision: "f64" }`.
+    // `every P (while G)? (: config)* { p <- e, … }` and
+    // `while G (: config)* { p <- e, … }` — an agent in its four
+    // forms (spec §5): paced and unguarded, paced and guarded,
+    // free-running and guarded, and `while true`, free-running and
+    // unguarded. The brace outranks the payload zone: an agent
+    // header bars a juxtaposed brace, so the brace is the agent's
+    // writes and never `P`'s or `G`'s payload (spec §2.3), and the
+    // `:` after the header is the agent's configuration,
+    // `: { precision: "f64" }`.
     agent: ($) =>
       prec.dynamic(
         1,
-        seq(
-          "every",
-          repeat($._newline),
-          field("period", $._expression_1),
-          optional(
-            seq(
-              repeat($._newline),
-              "while",
-              repeat($._newline),
-              field("guard", $._expression_1),
+        choice(
+          seq(
+            "every",
+            repeat($._newline),
+            field("period", $._expression_1),
+            optional(
+              seq(
+                repeat($._newline),
+                "while",
+                repeat($._newline),
+                field("guard", $._expression_1),
+              ),
             ),
-          ),
-          repeat(
-            seq(
-              alias(token(/(\n[ \t\r]*)*:/), ":"),
-              field("config", $._config_atom),
+            repeat(
+              seq(
+                alias(token(/(\n[ \t\r]*)*:/), ":"),
+                field("config", $._config_atom),
+              ),
             ),
+            field("body", $.body),
           ),
-          field("body", $.body),
+          seq(
+            "while",
+            repeat($._newline),
+            field("guard", $._expression_1),
+            repeat(
+              seq(
+                alias(token(/(\n[ \t\r]*)*:/), ":"),
+                field("config", $._config_atom),
+              ),
+            ),
+            field("body", $.body),
+          ),
         ),
       ),
 
@@ -277,6 +368,7 @@ module.exports = grammar({
         $.for_expression,
         $.each_expression,
         $.fold_expression,
+        $.match_expression,
         $.conditional_expression,
         $.unary_expression,
         $.range_expression,
@@ -285,26 +377,48 @@ module.exports = grammar({
         $.but_expression,
         $.absent_expression,
         $.index_expression,
-        $.projection_expression,
+        $.component_expression,
         $.config_expression,
         $.payload_expression,
       ),
 
+    // `if c then a else b` — `then` is required and the `else`
+    // clause is optional, the two alternatives standing here in that
+    // order. `else` is a continuation word (spec §2.1), so it may
+    // open a line of its own, and a next line beginning with any
+    // other word closes the conditional at its consequence.
+    // `if c then a` — the lowering supplies `none` for the
+    // alternative (spec §2.3). Reading the clause above first is
+    // what binds the `else` of `if a then if b then x else y` to
+    // the inner `if`.
     conditional_expression: ($) =>
-      prec.right(
-        0,
-        seq(
-          "if",
-          repeat($._newline),
-          field("condition", $._expression),
-          repeat($._newline),
-          "then",
-          repeat($._newline),
-          field("consequence", $._expression),
-          repeat($._newline),
-          "else",
-          repeat($._newline),
-          field("alternative", $._expression),
+      choice(
+        prec.right(
+          0,
+          seq(
+            "if",
+            repeat($._newline),
+            field("condition", $._expression),
+            repeat($._newline),
+            "then",
+            repeat($._newline),
+            field("consequence", $._expression),
+            choice("else", alias(token(/(\n[ \t\r]*)+else[ \t\r\n]/), "else")),
+            repeat($._newline),
+            field("alternative", $._expression),
+          ),
+        ),
+        prec.right(
+          0,
+          seq(
+            "if",
+            repeat($._newline),
+            field("condition", $._expression),
+            repeat($._newline),
+            "then",
+            repeat($._newline),
+            field("consequence", $._expression),
+          ),
         ),
       ),
 
@@ -489,35 +603,29 @@ module.exports = grammar({
     // the slot it stands on licenses absence. It rides the postfix chain,
     // so a call result marks too — `points(vec(x, y)?)`.
     absent_expression: ($) =>
-      prec.left(11, seq(field("value", $._expression), "?")),
+      prec.left(12, seq(field("value", $._expression), "?")),
 
     index_expression: ($) =>
       prec.left(
-        11,
+        12,
         seq(field("target", $._expression), field("index", $.subscript)),
       ),
 
-    // `f(x).D`, `U[i].S`, `(a + b).tau` — the projection of a product
-    // fiber's component (R:product-fiber), the dot after anything but a
-    // bare name: `u.D` and `ns.u.D` on a name are the one dotted run
-    // `qualified_identifier` already reads, and the lowering tells a
-    // projection from a namespace path by what the head names.
-    projection_expression: ($) =>
-      prec.left(
+    // `S of u`, `0 of v`, `a of c`, `(i, j) of m` — the component read
+    // (spec §2.10, R:component-key). It stands above every arithmetic and
+    // comparison operator and above unary minus, so `0 of v + 1` adds one
+    // to the component and `-0 of v` negates it, and its operand is a
+    // postfix-level expression, so `0 of f(x)` and `0 of v[s]` read as
+    // written. It groups right, so `0 of S of u` reads the product's
+    // component and then that value's.
+    component_expression: ($) =>
+      prec.right(
         11,
         seq(
-          field(
-            "target",
-            choice(
-              $.call_expression,
-              $.index_expression,
-              $.projection_expression,
-              $.absent_expression,
-              $.parenthesized_expression,
-            ),
-          ),
-          alias(token(/(\n[ \t\r]*)*\./), "."),
-          field("name", $.identifier),
+          field("key", $.component_key),
+          "of",
+          repeat($._newline),
+          field("value", $._expression),
         ),
       ),
 
@@ -530,7 +638,7 @@ module.exports = grammar({
         prec.dynamic(
           1,
           prec.left(
-            11,
+            12,
             seq(
               field("target", choice($.config_expression)),
               alias(token(/(\n[ \t\r]*)*:/), ":"),
@@ -539,7 +647,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          11,
+          12,
           seq(
             field("target", $._expression),
             alias(token(/(\n[ \t\r]*)*:/), ":"),
@@ -549,10 +657,10 @@ module.exports = grammar({
       ),
 
     // `head(…) { items }` — call sugar for a trailing List argument; a
-    // brace whose first item is a `path <-` write is the writes a control
+    // brace whose first item is a `port <-` write is the writes a control
     // head takes, which the lowering decides (spec §2.3)
     payload_expression: ($) =>
-      prec.left(11, seq(field("target", $._expression), field("body", $.body))),
+      prec.left(12, seq(field("target", $._expression), field("body", $.body))),
 
     // `_expression` without `payload_expression` and `config_expression` and `call_refusal`:
     // the rule a reference through `without` in the grammar's source
@@ -583,6 +691,7 @@ module.exports = grammar({
           $.for_expression,
           $.each_expression,
           $.fold_expression,
+          $.match_expression,
           alias($.conditional_expression_1, $.conditional_expression),
           alias($.unary_expression_1, $.unary_expression),
           alias($.range_expression_1, $.range_expression),
@@ -591,25 +700,38 @@ module.exports = grammar({
           alias($.but_expression_1, $.but_expression),
           alias($.absent_expression_1, $.absent_expression),
           alias($.index_expression_1, $.index_expression),
-          alias($.projection_expression_1, $.projection_expression),
+          alias($.component_expression_1, $.component_expression),
         ),
       ),
 
     conditional_expression_1: ($) =>
-      prec.right(
-        1,
-        seq(
-          "if",
-          repeat($._newline),
-          field("condition", $._expression_1),
-          repeat($._newline),
-          "then",
-          repeat($._newline),
-          field("consequence", $._expression_1),
-          repeat($._newline),
-          "else",
-          repeat($._newline),
-          field("alternative", $._expression_1),
+      choice(
+        prec.right(
+          1,
+          seq(
+            "if",
+            repeat($._newline),
+            field("condition", $._expression_1),
+            repeat($._newline),
+            "then",
+            repeat($._newline),
+            field("consequence", $._expression_1),
+            choice("else", alias(token(/(\n[ \t\r]*)+else[ \t\r\n]/), "else")),
+            repeat($._newline),
+            field("alternative", $._expression_1),
+          ),
+        ),
+        prec.right(
+          1,
+          seq(
+            "if",
+            repeat($._newline),
+            field("condition", $._expression_1),
+            repeat($._newline),
+            "then",
+            repeat($._newline),
+            field("consequence", $._expression_1),
+          ),
         ),
       ),
 
@@ -771,30 +893,22 @@ module.exports = grammar({
       ),
 
     absent_expression_1: ($) =>
-      prec.left(23, seq(field("value", $._expression_1), "?")),
+      prec.left(25, seq(field("value", $._expression_1), "?")),
 
     index_expression_1: ($) =>
       prec.left(
-        23,
+        25,
         seq(field("target", $._expression_1), field("index", $.subscript)),
       ),
 
-    projection_expression_1: ($) =>
-      prec.left(
+    component_expression_1: ($) =>
+      prec.right(
         23,
         seq(
-          field(
-            "target",
-            choice(
-              $.call_expression,
-              alias($.index_expression_1, $.index_expression),
-              alias($.projection_expression_1, $.projection_expression),
-              alias($.absent_expression_1, $.absent_expression),
-              $.parenthesized_expression,
-            ),
-          ),
-          alias(token(/(\n[ \t\r]*)*\./), "."),
-          field("name", $.identifier),
+          field("key", $.component_key),
+          "of",
+          repeat($._newline),
+          field("value", $._expression_1),
         ),
       ),
 
@@ -804,11 +918,30 @@ module.exports = grammar({
     // (R:diff-roster) — and a primed head is a call, so the parens
     // follow it. The precedence is what makes `f (n)` a call where
     // a name and a paren could also be a header's collection and a
-    // bare body, or a configuration atom and what follows it.
+    // bare body, or a configuration atom and what follows it. A
+    // parenthesized fiber description heads a call too,
+    // `(D: Real, E: Real)(1, 0)`, which is the anonymous spelling of a
+    // declared product's constructor (R:product-fiber, R:stated-fiber):
+    // in head position the parens can hold nothing else, since neither
+    // a product value nor a site literal takes arguments.
     call_expression: ($) =>
       prec(
         2,
         choice(
+          prec.dynamic(
+            3,
+            seq(
+              field("function", choice($.qualified_identifier, $.identifier)),
+              field("variants", $.variant_arguments),
+            ),
+          ),
+          prec.dynamic(
+            3,
+            seq(
+              field("described", $.described_head),
+              field("variants", $.variant_arguments),
+            ),
+          ),
           seq(
             field("function", choice($.qualified_identifier, $.identifier)),
             field("primes", $.primes),
@@ -818,7 +951,79 @@ module.exports = grammar({
             field("function", choice($.qualified_identifier, $.identifier)),
             field("arguments", $.argument_list),
           ),
+          prec.dynamic(
+            2,
+            seq(
+              field("described", $.described_head),
+              field("arguments", $.argument_list),
+            ),
+          ),
         ),
+      ),
+
+    // `(D: Real, E: Real)` standing where a constructor's name stands —
+    // in `(D: Real, E: Real)(1, 0)` and in the pattern
+    // `(D: Real, E: Real)(D, E) := u`. It is the description R:product-fiber
+    // rules names one fiber with its alias, written where no `fiber`
+    // item declares one, and each component states the fiber that
+    // component takes (R:stated-fiber). The lookahead is the
+    // interpreter's alone — a `component` states its own sentence for a
+    // missing `:`, and that sentence belongs to the declaration rather
+    // than to a paren the parser is still choosing between three
+    // readings of; tree-sitter, which is GLR, prints without it. A
+    // sum's variants stand here too, `(A: Real | B: Real)(A: 1.0)`
+    // (R:sum-fiber).
+    described_head: ($) =>
+      choice(
+        seq(
+          "(",
+          field("variant", $.variant),
+          repeat1(
+            seq(
+              repeat($._newline),
+              "|",
+              repeat($._newline),
+              field("variant", $.variant),
+            ),
+          ),
+          ")",
+        ),
+        seq(
+          "(",
+          repeat(choice(",", $._newline)),
+          field("component", $.component),
+          repeat(
+            seq(
+              repeat1(choice(",", $._newline)),
+              field("component", $.component),
+            ),
+          ),
+          repeat(choice(",", $._newline)),
+          ")",
+        ),
+      ),
+
+    // `(A: 1.0)` — the argument a sum fiber's constructor takes
+    // (R:sum-fiber): the variant it names and the payload it holds.
+    // The rule takes a run of them so that a call naming none or
+    // several is refused at elaboration, against the roster the
+    // declaration states, rather than by the parser.
+    variant_arguments: ($) =>
+      seq(
+        "(",
+        repeat(choice(",", $._newline)),
+        $.variant_argument,
+        repeat(seq(repeat1(choice(",", $._newline)), $.variant_argument)),
+        repeat(choice(",", $._newline)),
+        ")",
+      ),
+
+    variant_argument: ($) =>
+      seq(
+        field("name", $.identifier),
+        ":",
+        repeat($._newline),
+        field("value", $._expression),
       ),
 
     primes: (_) => token.immediate(/'+/),
@@ -961,6 +1166,71 @@ module.exports = grammar({
         ),
       ),
 
+    // `match s { A(x) then x  B(v) then norm(v) }` — the sum fiber's
+    // reader (R:sum-fiber), the header family's fourth member beside
+    // `if` and `for`. The scrutinee stands in the header's own zone,
+    // so the brace after it holds the arms rather than a payload on
+    // the scrutinee, and the arms separate as body items do, one per
+    // line or by commas. A trailing `else` arm stands where no
+    // variant's arm did; that every variant has an arm or an `else`
+    // stands, elaboration states against the declared roster.
+    match_expression: ($) =>
+      prec.dynamic(
+        1,
+        seq(
+          "match",
+          repeat($._newline),
+          field("scrutinee", $._expression_1),
+          "{",
+          repeat(choice(",", $._newline)),
+          optional(
+            seq(
+              choice($.match_arm, $.else_arm),
+              repeat(
+                seq(
+                  repeat1(choice(",", $._newline)),
+                  choice($.match_arm, $.else_arm),
+                ),
+              ),
+              repeat(choice(",", $._newline)),
+            ),
+          ),
+          "}",
+        ),
+      ),
+
+    // `A(x) then x` and `B(X: x, Y: y) then x + y` — one arm of a
+    // `match` (R:sum-fiber, spec §2.10): the variant's name, one
+    // sub-pattern for its payload, `then`, and the expression the arm
+    // takes. Since a variant holds exactly one payload, the parens may
+    // hold the items of the payload's named-parens pattern directly,
+    // `B(X: x, Y: y)` standing for `B((X: x, Y: y))`; the colons tell
+    // that spelling from the positional one, and both are admitted.
+    match_arm: ($) =>
+      seq(
+        field("variant", $.identifier),
+        "(",
+        choice(
+          seq(
+            repeat(choice(",", $._newline)),
+            $.named_sub_pattern,
+            repeat(seq(repeat1(choice(",", $._newline)), $.named_sub_pattern)),
+            repeat(choice(",", $._newline)),
+          ),
+          field("pattern", $._pattern),
+        ),
+        ")",
+        "then",
+        repeat($._newline),
+        field("body", $._expression),
+      ),
+
+    // `else e` — the arm a `match` takes where no variant's arm stood
+    // (R:sum-fiber). One of these stands in place of the arms the
+    // roster is missing.
+    else_arm: ($) =>
+      seq("else", repeat($._newline), field("body", $._expression)),
+
     // `for (i, j) in space { body }` and `for I in space body` — the
     // comprehension, the header family's third member (R:located-field,
     // R:site-value). The braced body has the higher dynamic precedence,
@@ -1003,21 +1273,129 @@ module.exports = grammar({
         ),
       ),
 
-    // the punctuation means one thing in both positions: a bare name
-    // binds the collection's element whole (R:site-value), a
-    // parenthesized comma tuple is a site and destructures that element
-    // — one binder per axis — and brackets are a list of things, here
-    // one binder per collection of the lockstep walk
-    // (R:lockstep-brackets). That the bracket walks at least two
-    // collections, the lowering states.
+    // the punctuation means one thing in both positions: one pattern
+    // binds the collection's element (R:site-value) — a name takes it
+    // whole, a parenthesized comma tuple is a site and destructures it
+    // one sub-pattern per axis, a constructor pattern reads its
+    // components — and brackets are a list of things, here one pattern
+    // per collection of the lockstep walk (R:lockstep-brackets). That
+    // the bracket walks at least two collections, the lowering states.
     binder_list: ($) =>
       choice(
-        $.identifier,
-        seq("(", $.identifier, repeat(seq(",", $.identifier)), ")"),
-        seq("[", $._lockstep_binder, repeat(seq(",", $._lockstep_binder)), "]"),
+        seq(
+          "[",
+          $._lockstep_binder,
+          repeat(
+            seq(repeat($._newline), ",", repeat($._newline), $._lockstep_binder),
+          ),
+          "]",
+        ),
+        $._pattern,
       ),
 
-    _lockstep_binder: ($) => $.identifier,
+    _lockstep_binder: ($) => $._pattern,
+
+    // A pattern — what stands wherever a name is bound (spec §2.10): a
+    // local, a `for` binder, a parameter, a control binder and a
+    // top-level item. A name binds the value whole, `_` binds nothing,
+    // `(i, j)` is the site tuple, `Cons(d, s, tau)` reads a declared
+    // product's components in the declared order, and `(at: p)` reads
+    // components by name (R:product-fiber). Every sub-pattern position
+    // takes any pattern, so the form nests. The three parenthesized
+    // forms begin the way an expression does, and the token after the
+    // first name decides between them.
+    _pattern: ($) =>
+      choice(
+        $.constructor_pattern,
+        $.named_pattern,
+        $.site_pattern,
+        $.identifier,
+      ),
+
+    // `Cons(d, vec(sx, sy), _)` — the components of `vec` or of a
+    // declared product fiber, positional in the declared order, one
+    // sub-pattern each. It mirrors the constructor literal
+    // (R:product-fiber), and the arity is checked against the
+    // declaration at elaboration. A fiber description heads it too,
+    // `(D: Real, E: Real)(D, E) := u`, which states the fiber the
+    // value takes and reads its components (R:stated-fiber).
+    constructor_pattern: ($) =>
+      choice(
+        seq(
+          field("head", $.identifier),
+          "(",
+          repeat(choice(",", $._newline)),
+          $._pattern,
+          repeat(seq(repeat1(choice(",", $._newline)), $._pattern)),
+          repeat(choice(",", $._newline)),
+          ")",
+        ),
+        prec.dynamic(
+          2,
+          seq(
+            field("described", $.described_head),
+            "(",
+            repeat(choice(",", $._newline)),
+            $._pattern,
+            repeat(seq(repeat1(choice(",", $._newline)), $._pattern)),
+            repeat(choice(",", $._newline)),
+            ")",
+          ),
+        ),
+      ),
+
+    // `(at: p, grab: q)`, `(0: x, 2: z)` — components by key, any subset
+    // in any order. It mirrors the value form a readout writes for an
+    // unnamed product (R:product-fiber), it is the form the gesture
+    // products take, and an integer key reads a `vec`, a site or a
+    // `Complex` by position (R:component-key).
+    named_pattern: ($) =>
+      seq(
+        "(",
+        repeat(choice(",", $._newline)),
+        $.named_sub_pattern,
+        repeat(seq(repeat1(choice(",", $._newline)), $.named_sub_pattern)),
+        repeat(choice(",", $._newline)),
+        ")",
+      ),
+
+    named_sub_pattern: ($) =>
+      seq(
+        field("name", choice($.identifier, $.number)),
+        ":",
+        repeat($._newline),
+        field("pattern", $._pattern),
+      ),
+
+    // `(i, j)` — a site tuple, one sub-pattern per axis
+    // (R:site-value). A rank-1 box destructures into one axis, so
+    // `(i)` states the one-wide tuple where the site literal `(3)` is
+    // grouping: parens hold a pattern where they hold no expression.
+    site_pattern: ($) =>
+      seq(
+        "(",
+        $._pattern,
+        repeat(seq(repeat($._newline), ",", repeat($._newline), $._pattern)),
+        ")",
+      ),
+
+    // The key of a component read (R:component-key): a name for a
+    // declared product fiber's component and for a `Color`'s channel,
+    // an integer for a `vec`, a site or a `Complex`, and a
+    // parenthesized pair for a `Mat` or a `Metric`. Nothing else
+    // stands before `of`, so the key is read at elaboration rather
+    // than computed.
+    component_key: ($) =>
+      choice(
+        $.identifier,
+        $.number,
+        seq(
+          "(",
+          $.number,
+          repeat1(seq(repeat($._newline), ",", repeat($._newline), $.number)),
+          ")",
+        ),
+      ),
 
     // parens with commas build a site (R:site-value, the literal): one
     // expression inside is grouping, and two or more are the
@@ -1038,8 +1416,10 @@ module.exports = grammar({
     // `(D: 1.0, S: vec(0.3, 0.4), tau: 2.5)` — a product fiber's value
     // stated component by component (R:product-fiber), and the override
     // a `but` takes (R:product-fit), one component included. A component
-    // name and its colon tell it from the site literal and from grouping
-    // parens, both of which hold bare expressions.
+    // key and its colon tell it from the site literal and from grouping
+    // parens, both of which hold bare expressions. An integer key names
+    // a component by position, so `v but (0: e)` updates a `vec`
+    // (R:component-key).
     product: ($) =>
       seq(
         "(",
@@ -1050,13 +1430,17 @@ module.exports = grammar({
         ")",
       ),
 
-    // the component wins over reading the name as an expression with a
-    // configuration after it (R:product-fiber)
+    // the component wins over reading the key as an expression with a
+    // configuration after it (R:product-fiber). A parenthesized run of
+    // coordinates in key position is the site key, so
+    // `A but ((i, j): 20.0)` writes one site of a field and
+    // `m but ((0, 1): 1.0)` one entry of a `Mat` — the base's rank
+    // decides which (R:component-key, R:product-fit).
     product_component: ($) =>
       prec(
-        12,
+        13,
         seq(
-          field("name", $.identifier),
+          field("name", choice($.identifier, $.number, $.site)),
           ":",
           repeat($._newline),
           field("value", $._expression),
@@ -1100,7 +1484,7 @@ module.exports = grammar({
     tap_expression: ($) =>
       seq(
         "tap",
-        optional(seq("(", field("binder", $.identifier), ")")),
+        optional(seq("(", field("binder", $._pattern), ")")),
         repeat(
           seq(
             alias(token(/(\n[ \t\r]*)*:/), ":"),
@@ -1181,20 +1565,36 @@ module.exports = grammar({
         ),
       ),
 
+    // `x := e` and `Cons(d, s, _) := u` — a local, whose left side is a
+    // pattern (spec §2.10). The parenthesized patterns begin the way an
+    // expression does, and the `:=` is what tells a local from a bare
+    // item. A local states an optional fiber after `:`, `a: Real := 3`,
+    // and the value it binds is held to it (R:stated-fiber); the
+    // lowering states that the annotation stands on a bare name, since
+    // a pattern already states what the value is.
     local: ($) =>
       seq(
-        field("name", $.identifier),
+        field("pattern", $._pattern),
+        optional(
+          seq(
+            alias(token(/(\n[ \t\r]*)*:/), ":"),
+            field("type", $.type_annotation),
+          ),
+        ),
         ":=",
         repeat($._newline),
         field("value", $._expression),
       ),
 
     // `state name := init` — a local transient port, declared inside a
-    // block or a function body (R:instance-state, spec §3).
+    // block or a function body (R:instance-state, spec §3). It states an
+    // optional fiber after `:` as every other binding site does
+    // (R:stated-fiber).
     state_local: ($) =>
       seq(
         "state",
         field("name", $.identifier),
+        optional(seq(":", field("type", $.type_annotation))),
         ":=",
         repeat($._newline),
         field("value", $._expression),
@@ -1203,25 +1603,17 @@ module.exports = grammar({
     // `p <- e` — this port takes that expression's value, one batch
     write: ($) =>
       seq(
-        field("target", $.port_path),
+        field("target", $.identifier),
         "<-",
         repeat($._newline),
         field("value", $._expression),
       ),
 
-    // the dot is the projection's token, so `{ a.b }` lexes one way for
-    // a write's target and for a namespaced name alike
-    port_path: ($) =>
-      seq(
-        $.identifier,
-        repeat(seq(alias(token(/(\n[ \t\r]*)*\./), "."), $.identifier)),
-      ),
-
     // `fig.panel` — one qualified identifier reaching into a used
-    // document's namespace (spec §10), or `u.D`, the projection of a
-    // product's component off a bare name (R:product-fiber): the
-    // lowering joins the segments into one name, and elaboration reads
-    // it by what the head names.
+    // document's namespace (spec §10). A dot on a value, `u.D`, is the
+    // same lexical run: the lowering joins the segments into one name,
+    // elaboration reads it by what the head names, and a head naming no
+    // namespace refuses with the redirect to `of` (R:component-key).
     qualified_identifier: ($) =>
       seq(
         field("namespace", $.identifier),
