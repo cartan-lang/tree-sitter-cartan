@@ -659,8 +659,22 @@ module.exports = grammar({
     // `head(…) { items }` — call sugar for a trailing List argument; a
     // brace whose first item is a `port <-` write is the writes a control
     // head takes, which the lowering decides (spec §2.3)
+    // `head [a, b]` — a payload of one row, exactly `head { [a, b] }`
+    // (spec §2.5, §8.4). The bracket opens on the head's line, as the
+    // brace does, so `head` and a `[` on the next line stay two items.
+    // The index takes its `[` immediately after its target, so `xs[i]`
+    // reads the element and `xs [i]` is this zone.
     payload_expression: ($) =>
-      prec.left(12, seq(field("target", $._expression), field("body", $.body))),
+      choice(
+        prec.left(
+          12,
+          seq(field("target", $._expression), field("body", $.body)),
+        ),
+        prec.left(
+          12,
+          seq(field("target", $._expression), field("body", $.list)),
+        ),
+      ),
 
     // `_expression` without `payload_expression` and `config_expression` and `call_refusal`:
     // the rule a reference through `without` in the grammar's source

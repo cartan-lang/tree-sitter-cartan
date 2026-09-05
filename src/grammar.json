@@ -2461,29 +2461,59 @@
       ]
     },
     "payload_expression": {
-      "type": "PREC_LEFT",
-      "value": 12,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "FIELD",
-            "name": "target",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_expression"
-            }
-          },
-          {
-            "type": "FIELD",
-            "name": "body",
-            "content": {
-              "type": "SYMBOL",
-              "name": "body"
-            }
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PREC_LEFT",
+          "value": 12,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "target",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "body",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "body"
+                }
+              }
+            ]
           }
-        ]
-      }
+        },
+        {
+          "type": "PREC_LEFT",
+          "value": 12,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "target",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "body",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "list"
+                }
+              }
+            ]
+          }
+        }
+      ]
     },
     "_expression_1": {
       "type": "PREC",

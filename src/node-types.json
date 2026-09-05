@@ -5361,6 +5361,10 @@
           {
             "type": "body",
             "named": true
+          },
+          {
+            "type": "list",
+            "named": true
           }
         ]
       },

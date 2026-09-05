@@ -1732,7 +1732,6 @@ main = [a, b]
       (identifier)
       (identifier))))
 
-
 ================================================================
 a positional pattern under a stated fiber, at a parameter and a local
 ================================================================
@@ -1820,3 +1819,124 @@ main = [sound(Prim(1.0, 0.0, 2.0)), head(Prim(1.0, 2.0, 3.0))]
               (number)
               (number)
               (number))))))))
+
+
+================================================================
+a bracketed payload is one row, on a bare head, a configured head and a call
+================================================================
+
+one = block [a, b]
+two = block : { gap: 10 } [a, b]
+three = canvas2d(xr, yr) [marks(tx)]
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (list
+        (identifier)
+        (identifier))))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (config_expression
+        target: (identifier)
+        config: (map
+          (map_entry
+            key: (identifier)
+            value: (number))))
+      body: (list
+        (identifier)
+        (identifier))))
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)
+          (identifier)))
+      body: (list
+        (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))))))
+
+================================================================
+a bracketed payload holds a comprehension, and a with-chain attaches after it
+================================================================
+
+menu = block [each name in options tab(name, current)] with tap { p <- 1.0 }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (with_expression
+      target: (payload_expression
+        target: (identifier)
+        body: (list
+          (each_expression
+            binders: (binder_list
+              (identifier))
+            collection: (identifier)
+            body: (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier)
+                (identifier))))))
+      control: (tap_expression
+        body: (body
+          (write
+            target: (identifier)
+            value: (number)))))))
+
+================================================================
+a bracketed payload nests, and an immediate bracket still indexes
+================================================================
+
+grid = block [block [a], xs[i]]
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (list
+        (payload_expression
+          target: (identifier)
+          body: (list
+            (identifier)))
+        (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (identifier))))))))
+
+================================================================
+a bracket on a fresh line is a row of the enclosing block, not a payload
+================================================================
+
+main = block {
+    block
+    [a, b]
+}
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (identifier)
+        (list
+          (identifier)
+          (identifier))))))
