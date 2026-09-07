@@ -630,7 +630,7 @@ module.exports = grammar({
       ),
 
     // `e : map` — configuration, ascribed against a registry signature.
-    // It chains, and a later key wins (R:config-chains). A link of the chain
+    // It chains, and a later key wins (R:config-map). A link of the chain
     // takes a dynamic precedence, so `e : a : b[i]` is two links with `b[i]`
     // the second atom rather than one link whose atom is `(a : b)[i]`.
     config_expression: ($) =>
@@ -1269,7 +1269,7 @@ module.exports = grammar({
       ),
 
     // `each x in xs { body }` and `each x in xs body` — the List
-    // comprehension, `for`'s sibling (R:comprehension-kinds): it walks a
+    // comprehension, `for`'s sibling (spec §2.7): it walks a
     // List or a 1-D range/box and builds a `List` of the body's results
     // where `for` builds a located field. The header shape is `for`'s
     // clause for clause.
@@ -1292,7 +1292,7 @@ module.exports = grammar({
     // whole, a parenthesized comma tuple is a site and destructures it
     // one sub-pattern per axis, a constructor pattern reads its
     // components — and brackets are a list of things, here one pattern
-    // per collection of the lockstep walk (R:lockstep-brackets). That
+    // per collection of the lockstep walk (R:binder-collection). That
     // the bracket walks at least two collections, the lowering states.
     binder_list: ($) =>
       choice(
@@ -1490,7 +1490,7 @@ module.exports = grammar({
     // which are the whole of the control. The config zone stands between
     // the head and its writes, as it does on a `fold`. The optional
     // binder is the form the rest of the control roster takes
-    // (R:control-primitives): `g` is bound to the gesture, and the body
+    // (spec §8.3): `g` is bound to the gesture, and the body
     // reads it by dot. `scrub(g)`, `hover(g)` and `wheel(g)` reach the
     // same reading through `call_expression` under a juxtaposed writes
     // brace, since those heads are ordinary names where `tap` is a
