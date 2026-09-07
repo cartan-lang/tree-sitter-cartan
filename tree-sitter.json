@@ -10,7 +10,7 @@
     }
   ],
   "metadata": {
-    "version": "0.6.7",
+    "version": "0.6.8",
     "license": "MIT",
     "description": "tree-sitter grammar for cartan documents (.cart)",
     "authors": [{ "name": "cartan" }]
