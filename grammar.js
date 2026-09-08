@@ -310,11 +310,11 @@ module.exports = grammar({
     type_annotation: ($) =>
       seq($.fiber_type, optional(seq("|", field("alternative", $.fiber_type)))),
 
-    // `every P (while G)? (: config)* { p <- e, … }` and
-    // `while G (: config)* { p <- e, … }` — an agent in its four
-    // forms (spec §5): paced and unguarded, paced and guarded,
-    // free-running and guarded, and `while true`, free-running and
-    // unguarded. The brace outranks the payload zone: an agent
+    // `every P (while G)? (: config)* { p <- e, … }` — an agent in
+    // its two forms (spec §5), guarded and unguarded. `P` is the
+    // period, of type `Real|None`, and `none` is the block that
+    // fires as fast as the runner allows. The brace outranks the
+    // payload zone: an agent
     // header bars a juxtaposed brace, so the brace is the agent's
     // writes and never `P`'s or `G`'s payload (spec §2.3), and the
     // `:` after the header is the agent's configuration,
@@ -322,39 +322,25 @@ module.exports = grammar({
     agent: ($) =>
       prec.dynamic(
         1,
-        choice(
-          seq(
-            "every",
-            repeat($._newline),
-            field("period", $._expression_1),
-            optional(
-              seq(
-                repeat($._newline),
-                "while",
-                repeat($._newline),
-                field("guard", $._expression_1),
-              ),
+        seq(
+          "every",
+          repeat($._newline),
+          field("period", $._expression_1),
+          optional(
+            seq(
+              repeat($._newline),
+              "while",
+              repeat($._newline),
+              field("guard", $._expression_1),
             ),
-            repeat(
-              seq(
-                alias(token(/(\n[ \t\r]*)*:/), ":"),
-                field("config", $._config_atom),
-              ),
-            ),
-            field("body", $.body),
           ),
-          seq(
-            "while",
-            repeat($._newline),
-            field("guard", $._expression_1),
-            repeat(
-              seq(
-                alias(token(/(\n[ \t\r]*)*:/), ":"),
-                field("config", $._config_atom),
-              ),
+          repeat(
+            seq(
+              alias(token(/(\n[ \t\r]*)*:/), ":"),
+              field("config", $._config_atom),
             ),
-            field("body", $.body),
           ),
+          field("body", $.body),
         ),
       ),
 
