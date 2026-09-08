@@ -39,11 +39,16 @@ module.exports = grammar({
     [$._expression, $.clause],
     [$._config_atom, $._expression],
     [$._expression, $._pattern],
+    [$._expression, $.map_sub_pattern],
+    [$._expression, $.map_walk],
     [$._expression, $.component_key],
     [$.fiber_type, $._pattern],
     [$.fiber_type, $._expression],
     [$.fiber_type, $._expression, $._pattern],
     [$.component, $.variant],
+    [$._expression, $._pattern, $.map_entry],
+    [$._expression, $._pattern, $.map_sub_pattern, $.map_entry],
+    [$.parenthesized_expression, $.computed_key],
   ],
 
   rules: {
@@ -107,18 +112,23 @@ module.exports = grammar({
         field("value", $._expression),
       ),
 
-    // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)` and
-    // `fiber Shape = (A: Real | B: Vector<Real, 3>)` — a fiber
-    // declaration: a product's components separated by `,`
-    // (R:product-fiber) or a sum's variants separated by `|`
-    // (R:sum-fiber), each a name and a fiber type, inside the named
-    // parens the value form already uses. A product states at least
-    // one component and a sum at least two variants, and no name
-    // twice, which the lowering states.
+    // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)`,
+    // `fiber Shape = (A: Real | B: Vector<Real, 3>)` and
+    // `fiber Instant = affine Real` — a fiber declaration: a
+    // product's components separated by `,` (R:product-fiber), a
+    // sum's variants separated by `|` (R:sum-fiber), each a name and
+    // a fiber type inside the named parens the value form already
+    // uses, or the module fiber an affine fiber's points differ by
+    // (R:affine-fiber). A product states at least one component and
+    // a sum at least two variants, and no name twice, which the
+    // lowering states. `fiber Space<k> = (start: Site<k>, extent:
+    // Extent<k>)` names a width parameter after the name, which the
+    // component fibers read (R:product-fiber).
     fiber_declaration: ($) =>
       seq(
         "fiber",
         field("name", $.identifier),
+        optional(seq("<", field("param", $.identifier), ">")),
         "=",
         choice(
           seq(
@@ -151,6 +161,7 @@ module.exports = grammar({
             ),
             ")",
           ),
+          seq("affine", field("module", $.fiber_type)),
         ),
       ),
 
@@ -239,16 +250,17 @@ module.exports = grammar({
         field("value", $._expression),
       ),
 
-    // `(D: D) = U` and `(i, j) = s` — a top-level pattern item
-    // (spec §4, §2.10): each name the pattern binds is a document name
-    // holding that component, and a field of products binds its
-    // component fields. The parenthesized patterns open where no other
-    // item does. The constructor form `Cons(D, S, tau) = U` is written
-    // the way a function definition is, and elaboration tells the two
-    // apart by what the head names.
+    // `(D: D) = U`, `(i, j) = s` and `{ rho, vel } = m` — a top-level
+    // pattern item (spec §4, §2.10): each name the pattern binds is a
+    // document name holding that component, exported through a `use`
+    // alias as any other document name is, and a field of products
+    // binds its component fields. The parenthesized patterns and the
+    // braced one open where no other item does. The constructor form
+    // `Cons(D, S, tau) = U` is written the way a function definition
+    // is, and elaboration tells the two apart by what the head names.
     pattern_binding: ($) =>
       seq(
-        field("pattern", choice($.named_pattern, $.site_pattern)),
+        field("pattern", choice($.named_pattern, $.site_pattern, $.map_pattern)),
         "=",
         repeat($._newline),
         field("value", $._expression),
@@ -1313,16 +1325,19 @@ module.exports = grammar({
     // local, a `for` binder, a parameter, a control binder and a
     // top-level item. A name binds the value whole, `_` binds nothing,
     // `(i, j)` is the site tuple, `Cons(d, s, tau)` reads a declared
-    // product's components in the declared order, and `(at: p)` reads
-    // components by name (R:product-fiber). Every sub-pattern position
+    // product's components in the declared order, `(at: p)` reads
+    // components by name (R:product-fiber), and `{ rho, vel }` reads
+    // a Map's entries by key. Every sub-pattern position
     // takes any pattern, so the form nests. The three parenthesized
     // forms begin the way an expression does, and the token after the
-    // first name decides between them.
+    // first name decides between them; the braced form begins the way
+    // a Map literal does, and the `:=` after it decides.
     _pattern: ($) =>
       choice(
         $.constructor_pattern,
         $.named_pattern,
         $.site_pattern,
+        $.map_pattern,
         $.identifier,
       ),
 
@@ -1379,6 +1394,34 @@ module.exports = grammar({
         ":",
         repeat($._newline),
         field("pattern", $._pattern),
+      ),
+
+    // `{ rho, vel }`, `{ rho: r }`, `{ pos: (x, y) }` — a Map's entries
+    // by key: the Map literal read backwards (spec §6), with the binder
+    // where the literal puts the value. A bare name is the key and the
+    // binder at once, renaming puts a sub-pattern after the colon as a
+    // named-parens pattern does, and the sub-pattern nests. A key
+    // stands twice refuses, and each key is the subscript that reads
+    // it (R:subscript-type).
+    map_pattern: ($) =>
+      seq(
+        "{",
+        repeat(choice(",", $._newline)),
+        $.map_sub_pattern,
+        repeat(seq(repeat1(choice(",", $._newline)), $.map_sub_pattern)),
+        repeat(choice(",", $._newline)),
+        "}",
+      ),
+
+    map_sub_pattern: ($) =>
+      choice(
+        seq(
+          field("key", $.identifier),
+          alias(token(/(\n[ \t\r]*)*:/), ":"),
+          repeat($._newline),
+          field("pattern", $._pattern),
+        ),
+        field("key", $.identifier),
       ),
 
     // `(i, j)` — a site tuple, one sub-pattern per axis
@@ -1508,8 +1551,11 @@ module.exports = grammar({
         field("body", $.body),
       ),
 
-    // `{ k: v, … }` — a Map literal: keys static, values live. An empty
-    // brace is an empty Map, which the precedence over `body` states.
+    // `{ k: v, (e): w, each k in ks { (k): f(k) } }` — a Map literal
+    // (spec §6): a bare key is its own name, a parenthesized key is
+    // an expression returning a Str, and a walk among the entries
+    // yields one entry per element. An empty brace is an empty
+    // Map, which the precedence over `body` states.
     map: ($) =>
       prec(
         1,
@@ -1518,8 +1564,13 @@ module.exports = grammar({
           repeat(choice(",", $._newline)),
           optional(
             seq(
-              $.map_entry,
-              repeat(seq(repeat1(choice(",", $._newline)), $.map_entry)),
+              choice($.map_entry, $.map_walk),
+              repeat(
+                seq(
+                  repeat1(choice(",", $._newline)),
+                  choice($.map_entry, $.map_walk),
+                ),
+              ),
               repeat(choice(",", $._newline)),
             ),
           ),
@@ -1527,12 +1578,55 @@ module.exports = grammar({
         ),
       ),
 
+    // `k: v` — one entry of a Map literal. A name, a colon and a value
+    // is also a body item configuring that name, `{ w: style }`, and
+    // the entry's dynamic precedence settles the brace toward the Map
+    // (spec §2.3). It stands on the entry rather than on the brace so
+    // that it grows with the entries, one configuration link being
+    // dynamic itself.
     map_entry: ($) =>
+      prec.dynamic(
+        2,
+        seq(
+          field("key", choice($.identifier, $.computed_key)),
+          alias(token(/(\n[ \t\r]*)*:/), ":"),
+          repeat($._newline),
+          field("value", $._expression),
+        ),
+      ),
+
+    // `(expr)` — a Map entry's key computed rather than named, since
+    // a bare identifier in a Map literal is the key's own name
+    // (spec §6). The expression returns a Str.
+    computed_key: ($) =>
       seq(
-        field("key", $.identifier),
-        ":",
-        repeat($._newline),
-        field("value", $._expression),
+        "(",
+        repeat(choice(",", $._newline)),
+        $._expression,
+        repeat(choice(",", $._newline)),
+        ")",
+      ),
+
+    // `each k in ks { (k): f(k) }` — a comprehension among a Map
+    // literal's entries (spec §2.7, §6): the header is `each`'s, and
+    // the body is a one-entry Map literal whose key is parenthesized,
+    // which the lowering holds it to. The walk is one item of the
+    // literal, so its entries land in walk order among the others.
+    // The dynamic precedence outranks the braced comprehension
+    // body's, so a brace holding a walk reads as the Map it is
+    // rather than as a body whose one item is an `each`.
+    map_walk: ($) =>
+      prec.dynamic(
+        3,
+        seq(
+          "each",
+          repeat($._newline),
+          field("binders", $.binder_list),
+          "in",
+          repeat($._newline),
+          field("collection", $._expression_1),
+          field("body", $.map),
+        ),
       ),
 
     // One brace rule for three jobs, self-describing by its items: `:=`
@@ -1585,7 +1679,11 @@ module.exports = grammar({
     // item. A local states an optional fiber after `:`, `a: Real := 3`,
     // and the value it binds is held to it (R:stated-fiber); the
     // lowering states that the annotation stands on a bare name, since
-    // a pattern already states what the value is.
+    // a pattern already states what the value is. The annotation's
+    // colon is the one a Map entry and a configuration zone take, so
+    // a brace opening `{ c: Real := 2` shifts one token for all
+    // three readings and keeps them alive to the `:=` that settles
+    // them (wisdom §141).
     local: ($) =>
       seq(
         field("pattern", $._pattern),

@@ -1940,3 +1940,255 @@ main = block {
         (list
           (identifier)
           (identifier))))))
+
+================================================================
+each binds a Map's entry under the pair pattern, and walks Lists in lockstep
+================================================================
+
+pairs = each (k, v) in m { v }
+lock = each [a, b] in [A, B] a + b
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (each_expression
+      binders: (binder_list
+        (site_pattern
+          (identifier)
+          (identifier)))
+      collection: (identifier)
+      body: (body
+        (identifier))))
+  (binding
+    name: (identifier)
+    value: (each_expression
+      binders: (binder_list
+        (identifier)
+        (identifier))
+      collection: (list
+        (identifier)
+        (identifier))
+      body: (binary_expression
+        left: (identifier)
+        right: (identifier)))))
+
+================================================================
+a Map literal takes a computed key and a walk among its entries
+================================================================
+
+th = { (name): 1, other: 2 }
+lt = { each k in keys(th) { (k): lighter(th[k]) }, base: 0 }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (map
+      (map_entry
+        key: (computed_key
+          (identifier))
+        value: (number))
+      (map_entry
+        key: (identifier)
+        value: (number))))
+  (binding
+    name: (identifier)
+    value: (map
+      (map_walk
+        binders: (binder_list
+          (identifier))
+        collection: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))
+        body: (map
+          (map_entry
+            key: (computed_key
+              (identifier))
+            value: (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (index_expression
+                  target: (identifier)
+                  index: (subscript
+                    (selector
+                      (identifier)))))))))
+      (map_entry
+        key: (identifier)
+        value: (number)))))
+
+================================================================
+a Map pattern reads entries by key, at a parameter, a local and a binder
+================================================================
+
+f({ rho, vel }) = rho * vel
+g(m) = {
+    { rho: r, pos: (x, y) } := m
+    r + x + y
+}
+main = each { rho, vel } in rows { rho * vel }
+
+----------------------------------------------------------------
+
+(source_file
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (map_pattern
+          (map_sub_pattern
+            key: (identifier))
+          (map_sub_pattern
+            key: (identifier)))))
+    body: (binary_expression
+      left: (identifier)
+      right: (identifier)))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)))
+    body: (body
+      (local
+        pattern: (map_pattern
+          (map_sub_pattern
+            key: (identifier)
+            pattern: (identifier))
+          (map_sub_pattern
+            key: (identifier)
+            pattern: (site_pattern
+              (identifier)
+              (identifier))))
+        value: (identifier))
+      (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (identifier))))
+  (binding
+    name: (identifier)
+    value: (each_expression
+      binders: (binder_list
+        (map_pattern
+          (map_sub_pattern
+            key: (identifier))
+          (map_sub_pattern
+            key: (identifier))))
+      collection: (identifier)
+      body: (body
+        (binary_expression
+          left: (identifier)
+          right: (identifier))))))
+
+================================================================
+an annotated local reads in every brace
+================================================================
+
+z = block {
+    c: Real := 2
+    c
+}
+f(y) = {
+    c: Real := 2
+    c + y
+}
+d = {
+    c: Real := 2
+    c
+}
+m = { c: Real, k: 1 }
+w = line(xs, ys) : { width: 2.0 }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (payload_expression
+      target: (identifier)
+      body: (body
+        (local
+          pattern: (identifier)
+          type: (type_annotation
+            (fiber_type
+              name: (identifier)))
+          value: (number))
+        (identifier))))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)))
+    body: (body
+      (local
+        pattern: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)))
+        value: (number))
+      (binary_expression
+        left: (identifier)
+        right: (identifier))))
+  (binding
+    name: (identifier)
+    value: (body
+      (local
+        pattern: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)))
+        value: (number))
+      (identifier)))
+  (binding
+    name: (identifier)
+    value: (map
+      (map_entry
+        key: (identifier)
+        value: (identifier))
+      (map_entry
+        key: (identifier)
+        value: (number))))
+  (binding
+    name: (identifier)
+    value: (config_expression
+      target: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)
+          (identifier)))
+      config: (map
+        (map_entry
+          key: (identifier)
+          value: (number))))))
+
+================================================================
+a Map pattern binds document names at a top-level item
+================================================================
+
+{ rho, vel } = m
+{ rho: r, pos: (x, y) } = node
+
+----------------------------------------------------------------
+
+(source_file
+  (pattern_binding
+    pattern: (map_pattern
+      (map_sub_pattern
+        key: (identifier))
+      (map_sub_pattern
+        key: (identifier)))
+    value: (identifier))
+  (pattern_binding
+    pattern: (map_pattern
+      (map_sub_pattern
+        key: (identifier)
+        pattern: (identifier))
+      (map_sub_pattern
+        key: (identifier)
+        pattern: (site_pattern
+          (identifier)
+          (identifier))))
+    value: (identifier)))
