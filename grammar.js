@@ -310,37 +310,55 @@ module.exports = grammar({
     type_annotation: ($) =>
       seq($.fiber_type, optional(seq("|", field("alternative", $.fiber_type)))),
 
-    // `every P (while G)? (: config)* { p <- e, … }` — an agent in
-    // its two forms (spec §5), guarded and unguarded. `P` is the
+    // `every P (while G)? (: config)* { p <- e, … }`, and
+    // `while G (: config)* { p <- e, … }` — an agent in its three
+    // spellings (spec §5), of which the third is sugar. `P` is the
     // period, of type `Real|None`, and `none` is the block that
-    // fires as fast as the runner allows. The brace outranks the
-    // payload zone: an agent
-    // header bars a juxtaposed brace, so the brace is the agent's
+    // fires as fast as the runner allows; **`while G` is the
+    // spelling of `every none while G`**, a guard with no period,
+    // and `while` with no guard is not a form. The brace outranks
+    // the payload zone: an agent
+    // header bars a juxtaposed brace, whichever spelling opens it,
+    // so the brace is the agent's
     // writes and never `P`'s or `G`'s payload (spec §2.3), and the
     // `:` after the header is the agent's configuration,
     // `: { precision: "f64" }`.
     agent: ($) =>
       prec.dynamic(
         1,
-        seq(
-          "every",
-          repeat($._newline),
-          field("period", $._expression_1),
-          optional(
-            seq(
-              repeat($._newline),
-              "while",
-              repeat($._newline),
-              field("guard", $._expression_1),
+        choice(
+          seq(
+            "every",
+            repeat($._newline),
+            field("period", $._expression_1),
+            optional(
+              seq(
+                repeat($._newline),
+                "while",
+                repeat($._newline),
+                field("guard", $._expression_1),
+              ),
             ),
-          ),
-          repeat(
-            seq(
-              alias(token(/(\n[ \t\r]*)*:/), ":"),
-              field("config", $._config_atom),
+            repeat(
+              seq(
+                alias(token(/(\n[ \t\r]*)*:/), ":"),
+                field("config", $._config_atom),
+              ),
             ),
+            field("body", $.body),
           ),
-          field("body", $.body),
+          seq(
+            "while",
+            repeat($._newline),
+            field("guard", $._expression_1),
+            repeat(
+              seq(
+                alias(token(/(\n[ \t\r]*)*:/), ":"),
+                field("config", $._config_atom),
+              ),
+            ),
+            field("body", $.body),
+          ),
         ),
       ),
 
@@ -1669,7 +1687,7 @@ module.exports = grammar({
     // colon is the one a Map entry and a configuration zone take, so
     // a brace opening `{ c: Real := 2` shifts one token for all
     // three readings and keeps them alive to the `:=` that settles
-    // them (wisdom §141).
+    // them.
     local: ($) =>
       seq(
         field("pattern", $._pattern),
