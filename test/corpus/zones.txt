@@ -395,10 +395,10 @@ a used document's names are reached through its namespace
 
 use "figure.cart" as fig
 
-th = thm.select(mode)
+th = thm::select(mode)
 
 main = block {
-    [ block, fig.xband(xr, tx) ]
+    [ block, fig::xband(xr, tx) ]
 }
 
 ----------------------------------------------------------------
@@ -1153,8 +1153,8 @@ rows = for i in 0..3 { state s := i, s }
 a tap binds its gesture, and the bare form still stands
 ================================================================
 
-fit = tap(g) : { hint: "fit" } { at <- g.at }
-half = tap(g) { i <- if g.at < 0.5 then 0 else 1 }
+fit = tap(g) : { hint: "fit" } { at <- at of g }
+half = tap(g) { i <- if at of g < 0.5 then 0 else 1 }
 plain = tap { n <- n + 1 }
 
 ----------------------------------------------------------------
@@ -1171,9 +1171,10 @@ plain = tap { n <- n + 1 }
       body: (body
         (write
           target: (identifier)
-          value: (qualified_identifier
-            namespace: (identifier)
-            name: (identifier))))))
+          value: (component_expression
+            key: (component_key
+              (identifier))
+            value: (identifier))))))
   (binding
     name: (identifier)
     value: (tap_expression
@@ -1183,9 +1184,10 @@ plain = tap { n <- n + 1 }
           target: (identifier)
           value: (conditional_expression
             condition: (binary_expression
-              left: (qualified_identifier
-                namespace: (identifier)
-                name: (identifier))
+              left: (component_expression
+                key: (component_key
+                  (identifier))
+                value: (identifier))
               right: (number))
             consequence: (number)
             alternative: (number))))))
@@ -2192,3 +2194,102 @@ a Map pattern binds document names at a top-level item
           (identifier)
           (identifier))))
     value: (identifier)))
+
+================================================================
+the 0.8.0 spellings: the separator, the use tails, a module, the join and a tagged literal
+================================================================
+
+use std::*
+use "fig.cart"::{panel, band}
+use "hydro.cart" as ideal with (pressure: ideal_gas)
+
+module hydro(pressure(rho: Real): Real, gamma: Real = 5.0 / 3.0) {
+    total(rho, v) = pressure(rho) + gamma * v
+}
+
+joined = "a" <> "b"
+    <> "c"
+label = f"x = {sin(x):.3sci} and {{brace}}"
+reached = ideal::total
+
+----------------------------------------------------------------
+
+(source_file
+  (use_declaration
+    namespace: (identifier)
+    imports: (import_list))
+  (use_declaration
+    path: (string)
+    imports: (import_list
+      name: (identifier)
+      name: (identifier)))
+  (use_declaration
+    path: (string)
+    alias: (identifier)
+    holes: (with_clause
+      (hole_binding
+        name: (identifier)
+        value: (identifier))))
+  (module_definition
+    name: (identifier)
+    holes: (hole_list
+      (hole
+        name: (identifier)
+        parameters: (parameter_list
+          (parameter
+            name: (identifier)
+            type: (type_annotation
+              (fiber_type
+                name: (identifier)))))
+        type: (type_annotation
+          (fiber_type
+            name: (identifier))))
+      (hole
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (identifier)))
+        default: (binary_expression
+          left: (number)
+          right: (number))))
+    (function_definition
+      name: (identifier)
+      parameters: (parameter_list
+        (parameter
+          name: (identifier))
+        (parameter
+          name: (identifier)))
+      body: (binary_expression
+        left: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))
+        right: (binary_expression
+          left: (identifier)
+          right: (identifier)))))
+  (binding
+    name: (identifier)
+    value: (binary_expression
+      left: (binary_expression
+        left: (string)
+        right: (string))
+      right: (string)))
+  (binding
+    name: (identifier)
+    value: (template_string
+      (chunk)
+      (substitution
+        expr: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))
+        spec: (format_spec))
+      (chunk)
+      (escape)
+      (chunk)
+      (escape)))
+  (binding
+    name: (identifier)
+    value: (qualified_identifier
+      namespace: (identifier)
+      name: (identifier))))

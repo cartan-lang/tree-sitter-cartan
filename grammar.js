@@ -75,6 +75,7 @@ module.exports = grammar({
       choice(
         $.doc_declaration,
         $.use_declaration,
+        $.module_definition,
         $.port_declaration,
         $.fiber_declaration,
         $.agent,
@@ -91,11 +92,153 @@ module.exports = grammar({
     // accepts the literal as an item anywhere.
     doc_declaration: ($) => field("text", $.triple_string),
 
+    // `use "fig.cart" as fig`, `use "fig.cart"::{panel}`, `use std::*`,
+    // `use std::{slider}` and `use "hydro.cart" as ideal with (pressure:
+    // ideal_gas)` — the one line that brings another document's names
+    // here (spec §10).
+    // 
+    // **The head is a quoted path or a bare namespace name**, and the
+    // absence of quotes is the whole of the difference: a path names a
+    // file, a bare name a namespace the language knows, `std` among
+    // them. **What follows either head is the same**: `as` binds the
+    // namespace under a name of the caller's choosing, `::*` and
+    // `::{a, b}` import names into this document's own scope, and a
+    // `with (…)` clause states the argument each of an instantiated
+    // module's holes takes. Where `as` is absent a file's stem is the
+    // namespace's name.
+    // 
+    // That a line states at most one of `as` and an import list, and
+    // which combinations a namespace head admits, the lowering states.
     use_declaration: ($) =>
       seq(
         "use",
-        field("path", $.string),
+        choice(field("path", $.string), field("namespace", $.identifier)),
+        optional(seq("::", field("imports", $.import_list))),
         optional(seq("as", field("alias", $.identifier))),
+        optional(field("holes", $.with_clause)),
+      ),
+
+    // `::*` and `::{lighter, slider}` — what a `use` line takes into
+    // this document's own scope (spec §10). The star imports every
+    // public name of the namespace and the braced list the names it
+    // writes; an imported name that collides with a binding of this
+    // document is refused at the `use` line, by name.
+    import_list: ($) =>
+      choice(
+        "*",
+        seq(
+          "{",
+          repeat(choice(",", $._newline)),
+          field("name", $.identifier),
+          repeat(
+            seq(repeat1(choice(",", $._newline)), field("name", $.identifier)),
+          ),
+          repeat(choice(",", $._newline)),
+          "}",
+        ),
+      ),
+
+    // `with (pressure: ideal_gas)` — the arguments an instantiated
+    // module's holes take (spec §10): one binding per hole the module
+    // head declares, the hole's name and the expression this document
+    // hands it. `with` is the control zone's word in expression
+    // position, and in a `use` line, where no expression stands, it is
+    // this clause and nothing else. That every hole is bound exactly
+    // once and that each argument fits the shape its hole declares,
+    // the lowering states.
+    with_clause: ($) =>
+      seq(
+        "with",
+        "(",
+        repeat(choice(",", $._newline)),
+        $.hole_binding,
+        repeat(seq(repeat1(choice(",", $._newline)), $.hole_binding)),
+        repeat(choice(",", $._newline)),
+        ")",
+      ),
+
+    hole_binding: ($) =>
+      seq(
+        field("name", $.identifier),
+        ":",
+        repeat($._newline),
+        field("value", $._expression),
+      ),
+
+    // `module hydro(pressure(rho: Real): Real) { … }` — a module
+    // written inside a document (spec §10): a body of items whose
+    // holes the instantiating `use` line fills. A document holding no
+    // `module` item is one module named by its file stem, so every
+    // `use` line in the corpus keeps its reading.
+    // 
+    // **A module holds values, functions and fibers alone.** A port,
+    // an update block and a `use` line are the document's, not the
+    // module's: a durable port declared inside a module instantiated
+    // twice would have one declaring line reachable through two names,
+    // and no atomic multi-file rename makes those two writes one (A7,
+    // A3). A module that needs a port takes it as a hole.
+    module_definition: ($) =>
+      seq(
+        "module",
+        field("name", $.identifier),
+        field("holes", $.hole_list),
+        "{",
+        repeat(choice(",", $._newline)),
+        optional(
+          seq(
+            $._module_item,
+            repeat(seq(repeat1(choice(",", $._newline)), $._module_item)),
+            repeat(choice(",", $._newline)),
+          ),
+        ),
+        "}",
+      ),
+
+    hole_list: ($) =>
+      seq(
+        "(",
+        repeat(choice(",", $._newline)),
+        optional(
+          seq(
+            $.hole,
+            repeat(seq(repeat1(choice(",", $._newline)), $.hole)),
+            repeat(choice(",", $._newline)),
+          ),
+        ),
+        ")",
+      ),
+
+    // `gamma: Real` and `pressure(rho: Real): Real` — one hole of a
+    // module head (spec §10): the name the module's body reads, and
+    // the shape whatever fills it must take. A plain name states the
+    // fiber its value takes, and a parenthesized parameter list states
+    // a function's shape, the fiber after the parens being the one the
+    // result takes. The parameter list is the declaration's own
+    // (R:stated-fiber), so a hole's parameters are written the way a
+    // function's are; that a hole's parameter declares no default, the
+    // lowering states.
+    // 
+    // A hole a value fills may state a default, `gamma: Real = 5.0 /
+    // 3.0`, and a `use` line leaving that hole unbound takes it. That a
+    // function-shaped hole states none — a default there would be a
+    // function value, and the function space is first-order — the
+    // lowering states.
+    hole: ($) =>
+      seq(
+        field("name", $.identifier),
+        optional(field("parameters", $.parameter_list)),
+        ":",
+        field("type", $.type_annotation),
+        optional(seq("=", repeat($._newline), field("default", $._expression))),
+      ),
+
+    _module_item: ($) =>
+      choice(
+        $.doc_declaration,
+        $.fiber_declaration,
+        $.pattern_binding,
+        $.function_definition,
+        $.binding,
       ),
 
     // `port name = expr` / `state name = expr` — every port holds an
@@ -370,6 +513,7 @@ module.exports = grammar({
         $.qualified_identifier,
         $.boolean,
         $.none,
+        $.template_string,
         $.identifier,
         $.number,
         $.triple_string,
@@ -492,6 +636,12 @@ module.exports = grammar({
 
     // the comparisons group left here, and the lowering refuses a chain
     // — `a < b < c` is two comparisons and says so
+    // `a <> b` — the join: the string two strings make, the list two
+    // lists make end to end, the union two Maps make. It stands at `+`'s
+    // precedence and groups left, and it is a continuation operator, so a
+    // line opening with `<>` attaches to the line above it. The lexer's
+    // longest match takes it over `<` followed by `>`, which is no legal
+    // sequence.
     // `-` carries no leading newlines: a line opening with `-` is a fresh
     // signed item, so `[1\n -2\n 3]` keeps its three items (spec §2.1)
     // `@` is the action operator (R:group-fiber): infix at the
@@ -547,6 +697,15 @@ module.exports = grammar({
           seq(
             field("left", $._expression),
             field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
+            repeat($._newline),
+            field("right", $._expression),
+          ),
+        ),
+        prec.left(
+          6,
+          seq(
+            field("left", $._expression),
+            field("operator", alias(token(/(\n[ \t\r]*)*<>/), "<>")),
             repeat($._newline),
             field("right", $._expression),
           ),
@@ -707,6 +866,7 @@ module.exports = grammar({
           $.qualified_identifier,
           $.boolean,
           $.none,
+          $.template_string,
           $.identifier,
           $.number,
           $.triple_string,
@@ -868,6 +1028,15 @@ module.exports = grammar({
           13,
           seq(
             field("left", $._expression_1),
+            field("operator", alias(token(/(\n[ \t\r]*)*<>/), "<>")),
+            repeat($._newline),
+            field("right", $._expression_1),
+          ),
+        ),
+        prec.left(
+          13,
+          seq(
+            field("left", $._expression_1),
             field("operator", "-"),
             repeat($._newline),
             field("right", $._expression_1),
@@ -939,6 +1108,279 @@ module.exports = grammar({
           "of",
           repeat($._newline),
           field("value", $._expression_1),
+        ),
+      ),
+
+    // `_expression` without `config_expression`:
+    // the rule a reference through `without` in the grammar's source
+    // reads — a loop header's expression, whose brace and colon belong
+    // to the header. Every node is aliased to its name in `_expression`, so
+    // the tree is the same tree; the precedences are lifted to
+    // `2p + 1` so the header's reading wins wherever the two could
+    // take the same text.
+    _expression_2: ($) =>
+      prec(
+        1,
+        choice(
+          $.call_expression,
+          $.qualified_identifier,
+          $.boolean,
+          $.none,
+          $.template_string,
+          $.identifier,
+          $.number,
+          $.triple_string,
+          $.string,
+          $.list,
+          $.product,
+          $.site,
+          $.parenthesized_expression,
+          $.map,
+          $.body,
+          $.tap_expression,
+          $.for_expression,
+          $.each_expression,
+          $.fold_expression,
+          $.match_expression,
+          alias($.conditional_expression_2, $.conditional_expression),
+          alias($.unary_expression_2, $.unary_expression),
+          alias($.range_expression_2, $.range_expression),
+          alias($.binary_expression_2, $.binary_expression),
+          alias($.with_expression_2, $.with_expression),
+          alias($.but_expression_2, $.but_expression),
+          alias($.absent_expression_2, $.absent_expression),
+          alias($.index_expression_2, $.index_expression),
+          alias($.component_expression_2, $.component_expression),
+          alias($.payload_expression_2, $.payload_expression),
+        ),
+      ),
+
+    conditional_expression_2: ($) =>
+      choice(
+        prec.right(
+          1,
+          seq(
+            "if",
+            repeat($._newline),
+            field("condition", $._expression_2),
+            repeat($._newline),
+            "then",
+            repeat($._newline),
+            field("consequence", $._expression_2),
+            choice("else", alias(token(/(\n[ \t\r]*)+else[ \t\r\n]/), "else")),
+            repeat($._newline),
+            field("alternative", $._expression_2),
+          ),
+        ),
+        prec.right(
+          1,
+          seq(
+            "if",
+            repeat($._newline),
+            field("condition", $._expression_2),
+            repeat($._newline),
+            "then",
+            repeat($._newline),
+            field("consequence", $._expression_2),
+          ),
+        ),
+      ),
+
+    unary_expression_2: ($) =>
+      choice(
+        prec(
+          9,
+          seq(
+            field("operator", "not"),
+            repeat($._newline),
+            field("operand", $._expression_2),
+          ),
+        ),
+        prec(
+          17,
+          seq(
+            field("operator", "-"),
+            repeat($._newline),
+            field("operand", $._expression_2),
+          ),
+        ),
+        prec(
+          17,
+          seq(
+            field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
+            repeat($._newline),
+            field("operand", $._expression_2),
+          ),
+        ),
+      ),
+
+    range_expression_2: ($) =>
+      prec.left(
+        3,
+        seq(
+          field("left", $._expression_2),
+          field(
+            "operator",
+            choice(
+              alias(token(/(\n[ \t\r]*)*\.\.=/), "..="),
+              alias(token(/(\n[ \t\r]*)*\.\./), ".."),
+            ),
+          ),
+          repeat($._newline),
+          field("right", $._expression_2),
+        ),
+      ),
+
+    binary_expression_2: ($) =>
+      choice(
+        prec.left(
+          5,
+          seq(
+            field("left", $._expression_2),
+            field(
+              "operator",
+              choice("or", alias(token(/(\n[ \t\r]*)+or[ \t\r\n]/), "or")),
+            ),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.left(
+          7,
+          seq(
+            field("left", $._expression_2),
+            field(
+              "operator",
+              choice("and", alias(token(/(\n[ \t\r]*)+and[ \t\r\n]/), "and")),
+            ),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.left(
+          11,
+          seq(
+            field("left", $._expression_2),
+            field(
+              "operator",
+              choice(
+                alias(token(/(\n[ \t\r]*)*==/), "=="),
+                alias(token(/(\n[ \t\r]*)*!=/), "!="),
+                alias(token(/(\n[ \t\r]*)*<=/), "<="),
+                alias(token(/(\n[ \t\r]*)*>=/), ">="),
+                alias(token(/(\n[ \t\r]*)*</), "<"),
+                alias(token(/(\n[ \t\r]*)*>/), ">"),
+              ),
+            ),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.left(
+          13,
+          seq(
+            field("left", $._expression_2),
+            field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.left(
+          13,
+          seq(
+            field("left", $._expression_2),
+            field("operator", alias(token(/(\n[ \t\r]*)*<>/), "<>")),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.left(
+          13,
+          seq(
+            field("left", $._expression_2),
+            field("operator", "-"),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.left(
+          15,
+          seq(
+            field("left", $._expression_2),
+            field(
+              "operator",
+              choice(
+                alias(token(/(\n[ \t\r]*)*\*/), "*"),
+                alias(token(/(\n[ \t\r]*)*\//), "/"),
+                alias(token(/(\n[ \t\r]*)*@/), "@"),
+              ),
+            ),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.right(
+          19,
+          seq(
+            field("left", $._expression_2),
+            field("operator", alias(token(/(\n[ \t\r]*)*\^/), "^")),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+      ),
+
+    with_expression_2: ($) =>
+      prec.left(
+        21,
+        seq(
+          field("target", $._expression_2),
+          choice("with", alias(token(/(\n[ \t\r]*)+with[ \t\r\n]/), "with")),
+          repeat($._newline),
+          field("control", $._expression_2),
+        ),
+      ),
+
+    but_expression_2: ($) =>
+      prec.left(
+        21,
+        seq(
+          field("target", $._expression_2),
+          choice("but", alias(token(/(\n[ \t\r]*)+but[ \t\r\n]/), "but")),
+          repeat($._newline),
+          field("override", $._expression_2),
+        ),
+      ),
+
+    absent_expression_2: ($) =>
+      prec.left(25, seq(field("value", $._expression_2), "?")),
+
+    index_expression_2: ($) =>
+      prec.left(
+        25,
+        seq(field("target", $._expression_2), field("index", $.subscript)),
+      ),
+
+    component_expression_2: ($) =>
+      prec.right(
+        23,
+        seq(
+          field("key", $.component_key),
+          "of",
+          repeat($._newline),
+          field("value", $._expression_2),
+        ),
+      ),
+
+    payload_expression_2: ($) =>
+      choice(
+        prec.left(
+          25,
+          seq(field("target", $._expression_2), field("body", $.body)),
+        ),
+        prec.left(
+          25,
+          seq(field("target", $._expression_2), field("body", $.list)),
         ),
       ),
 
@@ -1725,18 +2167,85 @@ module.exports = grammar({
         field("value", $._expression),
       ),
 
-    // `fig.panel` — one qualified identifier reaching into a used
-    // document's namespace (spec §10). A dot on a value, `u.D`, is the
-    // same lexical run: the lowering joins the segments into one name,
-    // elaboration reads it by what the head names, and a head naming no
-    // namespace refuses with the redirect to `of` (R:component-key).
+    // `fig::panel` — one qualified identifier reaching into a
+    // namespace (spec §10): a used document's, or one the language
+    // knows. `::` is the namespace separator everywhere, and it is the
+    // only one: a dot between two names is refused with this spelling,
+    // and a component is read by its key (R:component-key). The
+    // lowering joins the segments into one name and elaboration reads
+    // it by what the head names.
     qualified_identifier: ($) =>
       seq(
         field("namespace", $.identifier),
-        repeat1(
-          seq(alias(token(/(\n[ \t\r]*)*\./), "."), field("name", $.identifier)),
+        repeat1(seq("::", field("name", $.identifier))),
+      ),
+
+    // `f"e = {e:.3} deg"` and `f"""…"""` — the tagged literal, whose
+    // holes hold expressions (spec §2.1). The `f` stands against the
+    // opening quote and tags it, so an untagged literal keeps every
+    // meaning it has, braces included. A chunk is the text between the
+    // holes; `{{` and `}}` spell a brace; an escape is read as the
+    // quoted literal's is, and the triple-quoted form takes its holes
+    // with the raw form's other rules. A hole holds any expression of
+    // the language, resolved in the enclosing scope as any
+    // subexpression is, and states an optional format after `:`.
+    // 
+    // The literal desugars to the join before any node exists, so the
+    // graph holds what the operator spelling holds.
+    template_string: ($) =>
+      choice(
+        seq(
+          alias(token(/f"""/), "f\"\"\""),
+          repeat(choice($.raw_chunk, $.escape, $.substitution)),
+          token.immediate("\"\"\""),
+        ),
+        seq(
+          alias(token(/f"/), "f\""),
+          repeat(choice($.chunk, $.escape, $.substitution)),
+          token.immediate("\""),
         ),
       ),
+
+    // the text between a quoted tagged literal's holes: everything but
+    // the delimiter, the braces a hole and its escape are spelled
+    // with, a backslash and a newline
+    chunk: (_) => token.immediate(/[^"{}\\\n]+/),
+
+    // the same, inside `f"""…"""`: a quotation mark stands for itself
+    // where three do not close the literal, and the text reaches the
+    // value as written
+    raw_chunk: (_) => token.immediate(/(([^"{}\\]|"[^"{}\\]|""[^"{}\\]))+/),
+
+    // `\n`, `\"`, `{{` and `}}` — one character written as two inside a
+    // tagged literal. The backslash escapes are the quoted literal's
+    // (spec §2.1) and the doubled braces are the tagged literal's own,
+    // since a single brace opens a hole. Inside `f"""…"""` a backslash
+    // stands for itself, as it does in the untagged raw literal.
+    escape: (_) => token.immediate(/\\.|\{\{|\}\}/),
+
+    // `{e}` and `{e:.3}` — one hole of a tagged literal: an expression,
+    // and the format its value is written in. The configuration zone
+    // is left out of the hole's expression, since the colon inside a
+    // hole opens the format: a configured value is bound above the
+    // literal and named here.
+    substitution: ($) =>
+      seq(
+        token.immediate("{"),
+        repeat($._newline),
+        field("expr", $._expression_2),
+        optional(field("spec", $.format_spec)),
+        repeat($._newline),
+        "}",
+      ),
+
+    // `:.3`, `:sci`, `:eng` and `:.3sci` — the format a hole's value is
+    // written in: `fmt`'s two keys and nothing more, the digits after
+    // the point and the notation. It stands immediately after the
+    // expression, with no space before the colon, which is what tells
+    // it from the configuration zone's colon. Which texts are formats,
+    // the lowering states, so a spelling that is none is named in a
+    // sentence rather than left to the closing brace.
+    format_spec: (_) => token.immediate(/:[._A-Za-z0-9]+/),
 
     identifier: (_) => /[_A-Za-z][_A-Za-z0-9]*/,
 
