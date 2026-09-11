@@ -2293,3 +2293,30 @@ reached = ideal::total
     value: (qualified_identifier
       namespace: (identifier)
       name: (identifier))))
+
+================================================================
+a bare name after `::` is the one-name import list, after either head
+================================================================
+
+use std::okabe
+use "fig.cart"::panel
+main = okabe[0]
+
+----------------------------------------------------------------
+
+(source_file
+  (use_declaration
+    namespace: (identifier)
+    imports: (import_list
+      name: (identifier)))
+  (use_declaration
+    path: (string)
+    imports: (import_list
+      name: (identifier)))
+  (binding
+    name: (identifier)
+    value: (index_expression
+      target: (identifier)
+      index: (subscript
+        (selector
+          (number))))))

@@ -93,17 +93,17 @@ module.exports = grammar({
     doc_declaration: ($) => field("text", $.triple_string),
 
     // `use "fig.cart" as fig`, `use "fig.cart"::{panel}`, `use std::*`,
-    // `use std::{slider}` and `use "hydro.cart" as ideal with (pressure:
-    // ideal_gas)` — the one line that brings another document's names
-    // here (spec §10).
+    // `use std::{slider}`, `use std::slider` and `use "hydro.cart" as
+    // ideal with (pressure: ideal_gas)` — the one line that brings
+    // another document's names here (spec §10).
     // 
     // **The head is a quoted path or a bare namespace name**, and the
     // absence of quotes is the whole of the difference: a path names a
     // file, a bare name a namespace the language knows, `std` among
     // them. **What follows either head is the same**: `as` binds the
-    // namespace under a name of the caller's choosing, `::*` and
-    // `::{a, b}` import names into this document's own scope, and a
-    // `with (…)` clause states the argument each of an instantiated
+    // namespace under a name of the caller's choosing, `::*`, `::{a,
+    // b}` and `::a` import names into this document's own scope, and
+    // a `with (…)` clause states the argument each of an instantiated
     // module's holes takes. Where `as` is absent a file's stem is the
     // namespace's name.
     // 
@@ -118,11 +118,13 @@ module.exports = grammar({
         optional(field("holes", $.with_clause)),
       ),
 
-    // `::*` and `::{lighter, slider}` — what a `use` line takes into
-    // this document's own scope (spec §10). The star imports every
-    // public name of the namespace and the braced list the names it
-    // writes; an imported name that collides with a binding of this
-    // document is refused at the `use` line, by name.
+    // `::*`, `::{lighter, slider}` and `::slider` — what a `use` line
+    // takes into this document's own scope (spec §10). The star
+    // imports every public name of the namespace and the braced list
+    // the names it writes; a bare name is exactly the one-name list,
+    // so `use std::slider` and `use std::{slider}` are one line. An
+    // imported name that collides with a binding of this document is
+    // refused at the `use` line, by name.
     import_list: ($) =>
       choice(
         "*",
@@ -136,6 +138,7 @@ module.exports = grammar({
           repeat(choice(",", $._newline)),
           "}",
         ),
+        field("name", $.identifier),
       ),
 
     // `with (pressure: ideal_gas)` — the arguments an instantiated
