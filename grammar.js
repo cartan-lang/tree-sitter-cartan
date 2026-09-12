@@ -9,7 +9,8 @@
  * editors/tree-sitter-cartan/grammar.js`, then `tree-sitter generate`.
  *
  * It follows spec §2: an item is a binding, a port, a function,
- * an agent or a use, and every composite expression reads in four
+ * an agent, a use, or a bare name standing alone — which is the
+ * spelling of `main = name` — and every composite expression reads in four
  * zones — `head(constitutive) : config { payload } with control`
  * — in that fixed order and any number of turns.
  *
@@ -78,9 +79,11 @@ module.exports = grammar({
         $.module_definition,
         $.port_declaration,
         $.fiber_declaration,
+        $.struct_declaration,
         $.agent,
         $.pattern_binding,
         $.function_definition,
+        $.bare_name,
         $.binding,
       ),
 
@@ -311,6 +314,59 @@ module.exports = grammar({
         ),
       ),
 
+    // `struct State = { iter: Int, time: Real, cons: Array<Conserved, 2> }`
+    // — a name for a struct's entries, standing wherever a type
+    // annotation stands (R:stated-fiber). It is a declaration and no
+    // node: a document that states one shape at several binding sites
+    // writes the braces once.
+    // 
+    // **It is an alias and no constructor.** Braces build a struct and
+    // parens build a fiber, so a struct alias has no call form and
+    // `State(…)` refuses, naming the brace literal that builds one.
+    struct_declaration: ($) =>
+      seq(
+        "struct",
+        field("name", $.identifier),
+        "=",
+        field("entries", $.struct_type),
+      ),
+
+    // `{ iter: Int, cons: Array<Conserved, 2> }` — a struct's entries
+    // written where a type stands: one entry per key, in the order the
+    // text writes them, each a bare name and the kind it holds. It is
+    // the Map literal read backwards, as the brace pattern is
+    // (spec §2.10), and it nests.
+    // 
+    // **Parens describe a fiber's components and braces a struct's
+    // entries.** A fiber is plain old data at a site and a struct is a
+    // record of whole values, so the bracket tells the two apart and a
+    // struct stands in no field; that a struct is refused wherever a
+    // fiber is required, the lowering states.
+    struct_type: ($) =>
+      seq(
+        "{",
+        repeat(choice(",", $._newline)),
+        optional(
+          seq(
+            field("entry", $.struct_entry),
+            repeat(
+              seq(
+                repeat1(choice(",", $._newline)),
+                field("entry", $.struct_entry),
+              ),
+            ),
+            repeat(choice(",", $._newline)),
+          ),
+        ),
+        "}",
+      ),
+
+    // `iter: Int` — one entry of a struct: the key, and the kind the
+    // entry holds. That a struct states at least one entry, and no key
+    // twice, the lowering states.
+    struct_entry: ($) =>
+      seq(field("name", $.identifier), ":", field("type", $.fiber_type)),
+
     component: ($) =>
       seq(field("name", $.identifier), ":", field("type", $.fiber_type)),
 
@@ -361,6 +417,7 @@ module.exports = grammar({
           ),
           ")",
         ),
+        field("entries", $.struct_type),
         seq(
           field("name", $.identifier),
           optional(
@@ -395,6 +452,17 @@ module.exports = grammar({
         repeat($._newline),
         field("value", $._expression),
       ),
+
+    // `plot` standing alone on its line — **the spelling of `main =
+    // plot`** (R:bare-name, spec §8.8). One identifier and nothing
+    // after it but the line's end, so `=`, `:`, `(`, `{`, `<-` and
+    // `:=` all leave the name to the binding, the definition or the
+    // pattern that the punctuation makes of it. The lowering
+    // supplies the name `main` and the item reaches the elaborator
+    // as the binding it spells, so a document writing both refuses
+    // where two `main` bindings refuse. A module body holds no such
+    // item: a module declares no endpoint.
+    bare_name: ($) => field("name", $.identifier),
 
     // `(D: D) = U`, `(i, j) = s` and `{ rho, vel } = m` — a top-level
     // pattern item (spec §4, §2.10): each name the pattern binds is a
@@ -1391,9 +1459,11 @@ module.exports = grammar({
     // reached through its namespace (spec §10). Primes ride the head —
     // `f'(x)`, the univariate derivative at the prime count's order
     // (R:diff-roster) — and a primed head is a call, so the parens
-    // follow it. The precedence is what makes `f (n)` a call where
-    // a name and a paren could also be a header's collection and a
-    // bare body, or a configuration atom and what follows it. A
+    // follow it. **The paren follows the head immediately**, as the
+    // subscript's bracket follows its target: `f(x)` is a call and
+    // `f (x)` is the name `f` beside a parenthesized value, which is
+    // what lets a header's collection stand beside a bare body and a
+    // Map walk's collection beside its entry (spec §2.7, §6). A
     // parenthesized fiber description heads a call too,
     // `(D: Real, E: Real)(1, 0)`, which is the anonymous spelling of a
     // declared product's constructor (R:product-fiber, R:stated-fiber):
@@ -1485,7 +1555,7 @@ module.exports = grammar({
     // declaration states, rather than by the parser.
     variant_arguments: ($) =>
       seq(
-        "(",
+        token.immediate("("),
         repeat(choice(",", $._newline)),
         $.variant_argument,
         repeat(seq(repeat1(choice(",", $._newline)), $.variant_argument)),
@@ -1509,10 +1579,11 @@ module.exports = grammar({
     // the dynamic precedence keeps `f(a : style)` an ascription on `a`
     // rather than `a` beside a marked second slot. A name inside the
     // parens is a configuration key in the wrong zone, and says so
-    // (R:positional-parens).
+    // (R:positional-parens). The `(` is immediate, so a call's parens
+    // follow its head with no space between them.
     argument_list: ($) =>
       seq(
-        "(",
+        token.immediate("("),
         repeat(choice(",", $._newline)),
         optional(
           seq(
@@ -1796,12 +1867,13 @@ module.exports = grammar({
     // (R:product-fiber), and the arity is checked against the
     // declaration at elaboration. A fiber description heads it too,
     // `(D: Real, E: Real)(D, E) := u`, which states the fiber the
-    // value takes and reads its components (R:stated-fiber).
+    // value takes and reads its components (R:stated-fiber). The paren
+    // follows the head immediately, as the constructor literal's does.
     constructor_pattern: ($) =>
       choice(
         seq(
           field("head", $.identifier),
-          "(",
+          token.immediate("("),
           repeat(choice(",", $._newline)),
           $._pattern,
           repeat(seq(repeat1(choice(",", $._newline)), $._pattern)),
@@ -1812,7 +1884,7 @@ module.exports = grammar({
           2,
           seq(
             field("described", $.described_head),
-            "(",
+            token.immediate("("),
             repeat(choice(",", $._newline)),
             $._pattern,
             repeat(seq(repeat1(choice(",", $._newline)), $._pattern)),
@@ -1905,10 +1977,10 @@ module.exports = grammar({
 
     // parens with commas build a site (R:site-value, the literal): one
     // expression inside is grouping, and two or more are the
-    // coordinates of a position in ℤ^k. A name before the parens is
-    // still a call, by the postfix precedence that already decides
-    // `f (n)`. Newline separates as comma does, as in every bracketed
-    // run.
+    // coordinates of a position in ℤ^k. A name whose parens follow it
+    // immediately is still a call, and `f (n)` is that name beside
+    // this literal. Newline separates as comma does, as in every
+    // bracketed run.
     site: ($) =>
       seq(
         "(",
@@ -2056,14 +2128,19 @@ module.exports = grammar({
         ")",
       ),
 
-    // `each k in ks { (k): f(k) }` — a comprehension among a Map
+    // `each k in ks (k): f(k)` — a comprehension among a Map
     // literal's entries (spec §2.7, §6): the header is `each`'s, and
-    // the body is a one-entry Map literal whose key is parenthesized,
-    // which the lowering holds it to. The walk is one item of the
-    // literal, so its entries land in walk order among the others.
-    // The dynamic precedence outranks the braced comprehension
-    // body's, so a brace holding a walk reads as the Map it is
-    // rather than as a body whose one item is an `each`.
+    // the body is the one entry the walk writes per element, whose
+    // key is parenthesized. **The body is that entry, braced or
+    // bare**: `each k in ks (k): v` and `each k in ks { (k): v }`
+    // are the one walk, as a List's splice takes both spellings.
+    // The braceless form reads because a call's paren follows its
+    // head immediately, so the collection ends at the space before
+    // the key. The walk is one item of the literal, so its entries
+    // land in walk order among the others. The dynamic precedence
+    // outranks the braced comprehension body's, so a brace holding a
+    // walk reads as the Map it is rather than as a body whose one
+    // item is an `each`.
     map_walk: ($) =>
       prec.dynamic(
         3,
@@ -2074,8 +2151,24 @@ module.exports = grammar({
           "in",
           repeat($._newline),
           field("collection", $._expression_1),
-          field("body", $.map),
+          field("body", choice($.map, $.map_walk_entry)),
         ),
+      ),
+
+    // `(k): v` standing as a Map literal's walk body with no brace
+    // around it (spec §2.7, §6). It is the entry `map_entry` spells,
+    // held to the computed key: a bare name is the key's own name,
+    // which every element would then share, and the walk's brace-free
+    // body is the one place where a bare name here would also open a
+    // comprehension's bare body dressed by a configuration zone. The
+    // braced spelling takes `map_entry` through `map`, and the two
+    // lower as one entry.
+    map_walk_entry: ($) =>
+      seq(
+        field("key", $.computed_key),
+        alias(token(/(\n[ \t\r]*)*:/), ":"),
+        repeat($._newline),
+        field("value", $._expression),
       ),
 
     // One brace rule for three jobs, self-describing by its items: `:=`

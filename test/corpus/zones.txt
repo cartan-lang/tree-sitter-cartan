@@ -2320,3 +2320,134 @@ main = okabe[0]
       index: (subscript
         (selector
           (number))))))
+
+================================================================
+a struct alias declares its entries, and the braces state a type
+================================================================
+
+struct State = { iter: Int, cons: Array<Real, 2> }
+port u: { iter: Int, gas: { rho: Array<Real, 1> } }|None = none
+h5file: State = load("snap.h5")
+
+----------------------------------------------------------------
+
+(source_file
+  (struct_declaration
+    name: (identifier)
+    entries: (struct_type
+      entry: (struct_entry
+        name: (identifier)
+        type: (fiber_type
+          name: (identifier)))
+      entry: (struct_entry
+        name: (identifier)
+        type: (fiber_type
+          name: (identifier)
+          (fiber_type
+            name: (identifier))
+          (number)))))
+  (port_declaration
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        entries: (struct_type
+          entry: (struct_entry
+            name: (identifier)
+            type: (fiber_type
+              name: (identifier)))
+          entry: (struct_entry
+            name: (identifier)
+            type: (fiber_type
+              entries: (struct_type
+                entry: (struct_entry
+                  name: (identifier)
+                  type: (fiber_type
+                    name: (identifier)
+                    (fiber_type
+                      name: (identifier))
+                    (number))))))))
+      alternative: (fiber_type
+        name: (identifier)))
+    value: (none))
+  (binding
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (identifier)))
+    value: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (string)))))
+
+
+================================================================
+a Map literal's walk states its entry with no brace around it
+================================================================
+
+lt = { each k in keys(th) (k): th[k], base: 0 }
+ds = { each [s, g] in [snacks, nutrition] (s): 1.0 / g }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (map
+      (map_walk
+        binders: (binder_list
+          (identifier))
+        collection: (call_expression
+          function: (identifier)
+          arguments: (argument_list
+            (identifier)))
+        body: (map_walk_entry
+          key: (computed_key
+            (identifier))
+          value: (index_expression
+            target: (identifier)
+            index: (subscript
+              (selector
+                (identifier))))))
+      (map_entry
+        key: (identifier)
+        value: (number))))
+  (binding
+    name: (identifier)
+    value: (map
+      (map_walk
+        binders: (binder_list
+          (identifier)
+          (identifier))
+        collection: (list
+          (identifier)
+          (identifier))
+        body: (map_walk_entry
+          key: (computed_key
+            (identifier))
+          value: (binary_expression
+            left: (number)
+            right: (identifier)))))))
+
+
+================================================================
+a bare name standing alone is an item, and `=` keeps the binding
+================================================================
+
+plot = text("hi")
+plot
+x = 1
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (string))))
+  (bare_name
+    name: (identifier))
+  (binding
+    name: (identifier)
+    value: (number)))
