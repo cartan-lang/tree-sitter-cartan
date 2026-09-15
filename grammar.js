@@ -9,8 +9,8 @@
  * editors/tree-sitter-cartan/grammar.js`, then `tree-sitter generate`.
  *
  * It follows spec §2: an item is a binding, a port, a function,
- * an agent, a use, or a bare name standing alone — which is the
- * spelling of `main = name` — and every composite expression reads in four
+ * an agent, a use, or a bare expression standing alone — which is
+ * the spelling of `main = expr` — and every composite expression reads in four
  * zones — `head(constitutive) : config { payload } with control`
  * — in that fixed order and any number of turns.
  *
@@ -50,6 +50,7 @@ module.exports = grammar({
     [$._expression, $._pattern, $.map_entry],
     [$._expression, $._pattern, $.map_sub_pattern, $.map_entry],
     [$.parenthesized_expression, $.computed_key],
+    [$.variant_argument, $._pattern],
   ],
 
   rules: {
@@ -81,9 +82,9 @@ module.exports = grammar({
         $.fiber_declaration,
         $.struct_declaration,
         $.agent,
+        $.bare_expression,
         $.pattern_binding,
         $.function_definition,
-        $.bare_name,
         $.binding,
       ),
 
@@ -93,7 +94,14 @@ module.exports = grammar({
     // prose; standing above a binding it is that binding's prose. Which
     // one it is is positional, so the lowering decides it — the grammar
     // accepts the literal as an item anywhere.
-    doc_declaration: ($) => field("text", $.triple_string),
+    // 
+    // A triple string is an expression too, so a document's first line
+    // could be read as the bare item `main = """prose"""`
+    // (R:bare-item); the precedence here is the statement that a
+    // triple string standing alone as an item is the prose, and the
+    // interpreter, reading the alternatives in order, states the same
+    // by taking this one first.
+    doc_declaration: ($) => prec(1, field("text", $.triple_string)),
 
     // `use "fig.cart" as fig`, `use "fig.cart"::{panel}`, `use std::*`,
     // `use std::{slider}`, `use std::slider` and `use "hydro.cart" as
@@ -453,16 +461,34 @@ module.exports = grammar({
         field("value", $._expression),
       ),
 
-    // `plot` standing alone on its line — **the spelling of `main =
-    // plot`** (R:bare-name, spec §8.8). One identifier and nothing
-    // after it but the line's end, so `=`, `:`, `(`, `{`, `<-` and
-    // `:=` all leave the name to the binding, the definition or the
-    // pattern that the punctuation makes of it. The lowering
-    // supplies the name `main` and the item reaches the elaborator
-    // as the binding it spells, so a document writing both refuses
-    // where two `main` bindings refuse. A module body holds no such
-    // item: a module declares no endpoint.
-    bare_name: ($) => field("name", $.identifier),
+    // `plot`, `3.0 * x`, `canvas2d { … } with nav(xr)` standing alone
+    // as an item — **the spelling of `main = expr`** (R:bare-item,
+    // spec §8.8). Any expression stands here, over as many
+    // continuation lines as it takes, and the item ends where the
+    // line does. The lowering supplies the name `main` and the item
+    // reaches the elaborator as the binding it spells, so a document
+    // writing both refuses where two `main` bindings refuse. A
+    // module body holds no such item: a module declares no endpoint.
+    // 
+    // **The lookahead is what leaves every declaration the form it
+    // is**: an identifier followed by `=`, `:`, `:=` or `<-`, and an
+    // identifier followed by a parenthesized parameter list and then
+    // `=` or `:`, are the binding, the local, the write and the
+    // function definition, and a parenthesized or braced pattern
+    // followed by `=` is the top-level pattern; this item refuses
+    // them all before reading a word. What is left is exactly the
+    // bare expression: an identifier that runs on into a call's
+    // arguments, a `with`, a brace, a `.`, an operator or the line's
+    // end. A head whose parens the writer has not closed on the line
+    // stands out too, since the declaration forms read the same text
+    // and their own miss reports it as text run out. The lookahead
+    // is the interpreter's, which tree-sitter, being GLR, prints
+    // without: there the declaration's own `=` is what decides, and
+    // the two readings run together until it — `parameter_list`
+    // taking the immediate `(` is what carries the definition's
+    // reading that far, and `doc_declaration`'s precedence is what
+    // keeps a triple string standing alone the prose it is.
+    bare_expression: ($) => field("value", $._expression),
 
     // `(D: D) = U`, `(i, j) = s` and `{ rho, vel } = m` — a top-level
     // pattern item (spec §4, §2.10): each name the pattern binds is a
@@ -483,6 +509,12 @@ module.exports = grammar({
     // `name(params) : { k: default, … } = expr` — a transparent function
     // (A9). The declaration mirrors the call: the Map gives the
     // configuration names and their defaults.
+    // 
+    // The head is spelled exactly as a call is, and an item stands on
+    // a bare call too (R:bare-item), so the two readings run together
+    // until the `=` decides. What carries both that far is
+    // `parameter_list` taking the immediate `(` the lexer reads after
+    // a head as well as the plain one.
     function_definition: ($) =>
       seq(
         field("name", $.identifier),
@@ -495,7 +527,7 @@ module.exports = grammar({
 
     parameter_list: ($) =>
       seq(
-        "(",
+        choice(token.immediate("("), "("),
         repeat(choice(",", $._newline)),
         optional(
           seq(
@@ -1621,7 +1653,7 @@ module.exports = grammar({
       ),
 
     // One axis selector (R:located-field): an ordinary expression — an
-    // Int global coordinate, a range restriction, a `rel` mark — or an
+    // Int global coordinate or a range restriction — or an
     // open-ended range form, admitted in subscript position alone,
     // where the target's own box bounds the missing end: `a[4..]`,
     // `a[..10]`, `a[..=10]`, `a[..]`. `..=` with no end has nothing to
@@ -1712,7 +1744,7 @@ module.exports = grammar({
         ),
       ),
 
-    // `match s { A(x) then x  B(v) then norm(v) }` — the sum fiber's
+    // `match s { A(x) then x, B(v) then norm(v) }` — the sum fiber's
     // reader (R:sum-fiber), the header family's fourth member beside
     // `if` and `for`. The scrutinee stands in the header's own zone,
     // so the brace after it holds the arms rather than a payload on
@@ -1802,7 +1834,8 @@ module.exports = grammar({
 
     // `each x in xs { body }` and `each x in xs body` — the List
     // comprehension, `for`'s sibling (spec §2.7): it walks a
-    // List or a 1-D range/box and builds a `List` of the body's results
+    // List, a Map, a range or a box of any rank and builds a `List` of
+    // the body's results
     // where `for` builds a located field. The header shape is `for`'s
     // clause for clause.
     each_expression: ($) =>

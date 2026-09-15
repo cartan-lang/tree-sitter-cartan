@@ -115,6 +115,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "bare_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "pattern_binding"
         },
         {
@@ -123,20 +127,20 @@
         },
         {
           "type": "SYMBOL",
-          "name": "bare_name"
-        },
-        {
-          "type": "SYMBOL",
           "name": "binding"
         }
       ]
     },
     "doc_declaration": {
-      "type": "FIELD",
-      "name": "text",
+      "type": "PREC",
+      "value": 1,
       "content": {
-        "type": "SYMBOL",
-        "name": "triple_string"
+        "type": "FIELD",
+        "name": "text",
+        "content": {
+          "type": "SYMBOL",
+          "name": "triple_string"
+        }
       }
     },
     "use_declaration": {
@@ -1601,12 +1605,12 @@
         }
       ]
     },
-    "bare_name": {
+    "bare_expression": {
       "type": "FIELD",
-      "name": "name",
+      "name": "value",
       "content": {
         "type": "SYMBOL",
-        "name": "identifier"
+        "name": "_expression"
       }
     },
     "pattern_binding": {
@@ -1730,8 +1734,20 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "("
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "IMMEDIATE_TOKEN",
+              "content": {
+                "type": "STRING",
+                "value": "("
+              }
+            },
+            {
+              "type": "STRING",
+              "value": "("
+            }
+          ]
         },
         {
           "type": "REPEAT",
@@ -9287,6 +9303,10 @@
     [
       "parenthesized_expression",
       "computed_key"
+    ],
+    [
+      "variant_argument",
+      "_pattern"
     ]
   ],
   "precedences": [],

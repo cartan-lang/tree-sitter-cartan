@@ -185,11 +185,11 @@ main = block : { gap: 10 } {
               (identifier))))))))
 
 ================================================================
-a subscript states ranges, rel marks, and the open-ended forms
+a subscript states ranges, calls, and the open-ended forms
 ================================================================
 
 half = wave[4..10]
-tail = wave[rel(-50..=-1)]
+tail = wave[len(wave) - 50 .. len(wave)]
 row = f[1, ..]
 
 ----------------------------------------------------------------
@@ -210,14 +210,17 @@ row = f[1, ..]
       target: (identifier)
       index: (subscript
         (selector
-          (call_expression
-            function: (identifier)
-            arguments: (argument_list
-              (range_expression
-                left: (unary_expression
-                  operand: (number))
-                right: (unary_expression
-                  operand: (number)))))))))
+          (range_expression
+            left: (binary_expression
+              left: (call_expression
+                function: (identifier)
+                arguments: (argument_list
+                  (identifier)))
+              right: (number))
+            right: (call_expression
+              function: (identifier)
+              arguments: (argument_list
+                (identifier))))))))
   (binding
     name: (identifier)
     value: (index_expression
@@ -2446,8 +2449,73 @@ x = 1
       function: (identifier)
       arguments: (argument_list
         (string))))
-  (bare_name
-    name: (identifier))
+  (bare_expression
+    value: (identifier))
   (binding
+    name: (identifier)
+    value: (number)))
+
+================================================================
+a bare expression standing alone is an item, whatever it is
+================================================================
+
+3.0 * x
+canvas2d { line(pts) } with nav(xr)
+panel("hi")
+
+----------------------------------------------------------------
+
+(source_file
+  (bare_expression
+    value: (binary_expression
+      left: (number)
+      right: (identifier)))
+  (bare_expression
+    value: (with_expression
+      target: (payload_expression
+        target: (identifier)
+        body: (body
+          (call_expression
+            function: (identifier)
+            arguments: (argument_list
+              (identifier)))))
+      control: (call_expression
+        function: (identifier)
+        arguments: (argument_list
+          (identifier)))))
+  (bare_expression
+    value: (call_expression
+      function: (identifier)
+      arguments: (argument_list
+        (string)))))
+
+================================================================
+the declaration forms keep their heads from the bare item
+================================================================
+
+x = 1
+f(x) = x
+y: Real = 1
+port p = 1
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (number))
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)))
+    body: (identifier))
+  (binding
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (identifier)))
+    value: (number))
+  (port_declaration
     name: (identifier)
     value: (number)))
