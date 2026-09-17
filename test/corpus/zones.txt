@@ -279,7 +279,7 @@ xband(r, t) : { thickness: 30 } = canvas1d(r) : { thickness: thickness } {
 ports, locals, and a Map bound to a name
 ================================================================
 
-port freq = 3.0
+param freq = 3.0
 state time = 0.0
 tickstyle = { across: [0.0, 0.25] }
 v = { n := 4, linspace(0.0, 1.0, n) }
@@ -437,7 +437,7 @@ main = block {
 a with-chain attaches to a bare call, with no configuration between
 ================================================================
 
-port tapped = true
+param tapped = true
 
 main = block {
     text(if tapped then "hi" else "bye") with tap { tapped <- not tapped }
@@ -551,7 +551,7 @@ w = (r1 * r2) @ v
 none is a literal, and the presence guard reads it
 ================================================================
 
-port m = none
+param m = none
 
 main = block {
     text(if m == none then "away" else fmt(m))
@@ -1547,7 +1547,7 @@ every binding site states an optional fiber, and a description heads a construct
 ================================================================
 
 a: Real = 3
-port x: Vector<Real, 2>|None = vec(0, 0)
+param x: Vector<Real, 2>|None = vec(0, 0)
 state n: Int = 0
 u = (D: Real, E: Real)(1, 0)
 z = block {
@@ -2206,7 +2206,7 @@ use std::*
 use "fig.cart"::{panel, band}
 use "hydro.cart" as ideal with (pressure: ideal_gas)
 
-module hydro(pressure(rho: Real): Real, gamma: Real = 5.0 / 3.0) {
+namespace hydro(pressure(rho: Real): Real, gamma: Real = 5.0 / 3.0) {
     total(rho, v) = pressure(rho) + gamma * v
 }
 
@@ -2233,7 +2233,7 @@ reached = ideal::total
       (hole_binding
         name: (identifier)
         value: (identifier))))
-  (module_definition
+  (namespace_definition
     name: (identifier)
     holes: (hole_list
       (hole
@@ -2329,7 +2329,7 @@ a struct alias declares its entries, and the braces state a type
 ================================================================
 
 struct State = { iter: Int, cons: Array<Real, 2> }
-port u: { iter: Int, gas: { rho: Array<Real, 1> } }|None = none
+param u: { iter: Int, gas: { rho: Array<Real, 1> } }|None = none
 h5file: State = load("snap.h5")
 
 ----------------------------------------------------------------
@@ -2496,7 +2496,7 @@ the declaration forms keep their heads from the bare item
 x = 1
 f(x) = x
 y: Real = 1
-port p = 1
+param p = 1
 
 ----------------------------------------------------------------
 

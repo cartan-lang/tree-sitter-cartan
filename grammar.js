@@ -47,6 +47,9 @@ module.exports = grammar({
     [$.fiber_type, $._expression],
     [$.fiber_type, $._expression, $._pattern],
     [$.component, $.variant],
+    [$._expression, $.variant],
+    [$._pattern, $.variant],
+    [$._expression, $._pattern, $.variant],
     [$._expression, $._pattern, $.map_entry],
     [$._expression, $._pattern, $.map_sub_pattern, $.map_entry],
     [$.parenthesized_expression, $.computed_key],
@@ -77,7 +80,7 @@ module.exports = grammar({
       choice(
         $.doc_declaration,
         $.use_declaration,
-        $.module_definition,
+        $.namespace_definition,
         $.port_declaration,
         $.fiber_declaration,
         $.struct_declaration,
@@ -115,8 +118,8 @@ module.exports = grammar({
     // namespace under a name of the caller's choosing, `::*`, `::{a,
     // b}` and `::a` import names into this document's own scope, and
     // a `with (…)` clause states the argument each of an instantiated
-    // module's holes takes. Where `as` is absent a file's stem is the
-    // namespace's name.
+    // namespace's holes takes. Where `as` is absent a file's stem is
+    // the namespace's name.
     // 
     // That a line states at most one of `as` and an import list, and
     // which combinations a namespace head admits, the lowering states.
@@ -153,7 +156,7 @@ module.exports = grammar({
       ),
 
     // `with (pressure: ideal_gas)` — the arguments an instantiated
-    // module's holes take (spec §10): one binding per hole the module
+    // namespace's holes take (spec §10): one binding per hole the
     // head declares, the hole's name and the expression this document
     // hands it. `with` is the control zone's word in expression
     // position, and in a `use` line, where no expression stands, it is
@@ -179,29 +182,29 @@ module.exports = grammar({
         field("value", $._expression),
       ),
 
-    // `module hydro(pressure(rho: Real): Real) { … }` — a module
+    // `namespace hydro(pressure(rho: Real): Real) { … }` — a unit
     // written inside a document (spec §10): a body of items whose
-    // holes the instantiating `use` line fills. A document holding no
-    // `module` item is one module named by its file stem, so every
+    // holes the instantiating `use` line fills. A document holding
+    // no `namespace` item is one named by its file stem, so every
     // `use` line in the corpus keeps its reading.
     // 
-    // **A module holds values, functions and fibers alone.** A port,
-    // an update block and a `use` line are the document's, not the
-    // module's: a durable port declared inside a module instantiated
-    // twice would have one declaring line reachable through two names,
-    // and no atomic multi-file rename makes those two writes one (A7,
-    // A3). A module that needs a port takes it as a hole.
-    module_definition: ($) =>
+    // **It holds values, functions and fibers alone.** A port, an
+    // update block and a `use` line are the document's, not its: a
+    // durable port declared inside one instantiated twice would
+    // have one declaring line reachable through two names, and no
+    // atomic multi-file rename makes those two writes one (A7,
+    // A3). One that needs a port takes it as a hole.
+    namespace_definition: ($) =>
       seq(
-        "module",
+        "namespace",
         field("name", $.identifier),
         field("holes", $.hole_list),
         "{",
         repeat(choice(",", $._newline)),
         optional(
           seq(
-            $._module_item,
-            repeat(seq(repeat1(choice(",", $._newline)), $._module_item)),
+            $._namespace_item,
+            repeat(seq(repeat1(choice(",", $._newline)), $._namespace_item)),
             repeat(choice(",", $._newline)),
           ),
         ),
@@ -223,7 +226,7 @@ module.exports = grammar({
       ),
 
     // `gamma: Real` and `pressure(rho: Real): Real` — one hole of a
-    // module head (spec §10): the name the module's body reads, and
+    // namespace head (spec §10): the name the body reads, and
     // the shape whatever fills it must take. A plain name states the
     // fiber its value takes, and a parenthesized parameter list states
     // a function's shape, the fiber after the parens being the one the
@@ -246,7 +249,7 @@ module.exports = grammar({
         optional(seq("=", repeat($._newline), field("default", $._expression))),
       ),
 
-    _module_item: ($) =>
+    _namespace_item: ($) =>
       choice(
         $.doc_declaration,
         $.fiber_declaration,
@@ -255,13 +258,14 @@ module.exports = grammar({
         $.binding,
       ),
 
-    // `port name = expr` / `state name = expr` — every port holds an
-    // initial (axiom A2). A port states an optional fiber after `:`,
-    // `port x: Vector<Real, 2>|None = vec(0, 0)`, and the initial is
+    // `param name = expr` / `state name = expr` — every port holds an
+    // initial (axiom A2). A `param` belongs to the text and a `state`
+    // to the run. A port states an optional fiber after `:`,
+    // `state x: Vector<Real, 2>|None = vec(0, 0)`, and the initial is
     // held to it (R:stated-fiber).
     port_declaration: ($) =>
       seq(
-        field("kind", choice("port", "state")),
+        field("kind", choice("param", "state")),
         field("name", $.identifier),
         optional(seq(":", field("type", $.type_annotation))),
         "=",
@@ -271,21 +275,32 @@ module.exports = grammar({
 
     // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)`,
     // `fiber Shape = (A: Real | B: Vector<Real, 3>)` and
-    // `fiber Instant = affine Real` — a fiber declaration: a
+    // `fiber Instant = torsor Real` — a fiber declaration: a
     // product's components separated by `,` (R:product-fiber), a
     // sum's variants separated by `|` (R:sum-fiber), each a name and
     // a fiber type inside the named parens the value form already
-    // uses, or the module fiber an affine fiber's points differ by
+    // uses — a variant written as a bare name taking no payload,
+    // so `fiber Mode = (Binary | Single)` is an enumeration — or
+    // the module fiber a torsor's points differ by
     // (R:affine-fiber). A product states at least one component and
     // a sum at least two variants, and no name twice, which the
     // lowering states. `fiber Space<k> = (start: Site<k>, extent:
     // Extent<k>)` names a width parameter after the name, which the
     // component fibers read (R:product-fiber).
+    // 
+    // **A declared product states its algebra after `:`**
+    // (R:fiber-algebra): `fiber Conserved: Module = (…)` admits
+    // componentwise addition, negation and scaling, `fiber
+    // Primitive: Algebra = (…)` the componentwise product of two
+    // values besides, and a declaration writing no word is a set
+    // every arithmetic operator refuses on. A sum and a torsor
+    // state no word, each carrying a structure of its own.
     fiber_declaration: ($) =>
       seq(
         "fiber",
         field("name", $.identifier),
         optional(seq("<", field("param", $.identifier), ">")),
+        optional(seq(":", field("algebra", $.identifier))),
         "=",
         choice(
           seq(
@@ -318,7 +333,7 @@ module.exports = grammar({
             ),
             ")",
           ),
-          seq("affine", field("module", $.fiber_type)),
+          seq("torsor", field("module", $.fiber_type)),
         ),
       ),
 
@@ -378,11 +393,16 @@ module.exports = grammar({
     component: ($) =>
       seq(field("name", $.identifier), ":", field("type", $.fiber_type)),
 
-    // `A: Real` — one variant of a sum fiber (R:sum-fiber): its name
-    // and the fiber its payload takes. Every variant states a
-    // payload.
+    // `A: Real` and `Binary` — one variant of a sum fiber
+    // (R:sum-fiber): its name, and the fiber its payload takes where
+    // it takes one. **A variant written as a bare name takes no
+    // payload**, so `(Binary | Single)` is an enumeration and
+    // `(Point | Segment: Real)` mixes the two forms.
     variant: ($) =>
-      seq(field("name", $.identifier), ":", field("type", $.fiber_type)),
+      seq(
+        field("name", $.identifier),
+        optional(seq(":", field("type", $.fiber_type))),
+      ),
 
     // A fiber type: a name with optional `<…>` arguments, types or
     // widths — `Real`, `Vector<Real, 2>`, `Site<3>` — or a product's
@@ -468,7 +488,7 @@ module.exports = grammar({
     // line does. The lowering supplies the name `main` and the item
     // reaches the elaborator as the binding it spells, so a document
     // writing both refuses where two `main` bindings refuse. A
-    // module body holds no such item: a module declares no endpoint.
+    // namespace body holds no such item: it declares no endpoint.
     // 
     // **The lookahead is what leaves every declaration the form it
     // is**: an identifier followed by `=`, `:`, `:=` or `<-`, and an
@@ -1777,27 +1797,36 @@ module.exports = grammar({
         ),
       ),
 
-    // `A(x) then x` and `B(X: x, Y: y) then x + y` — one arm of a
-    // `match` (R:sum-fiber, spec §2.10): the variant's name, one
-    // sub-pattern for its payload, `then`, and the expression the arm
-    // takes. Since a variant holds exactly one payload, the parens may
-    // hold the items of the payload's named-parens pattern directly,
-    // `B(X: x, Y: y)` standing for `B((X: x, Y: y))`; the colons tell
-    // that spelling from the positional one, and both are admitted.
+    // `A(x) then x`, `B(X: x, Y: y) then x + y` and `Binary then 2` —
+    // one arm of a `match` (R:sum-fiber, spec §2.10): the variant's
+    // name, one sub-pattern for its payload where it takes one,
+    // `then`, and the expression the arm takes. Since a variant holds
+    // exactly one payload, the parens may hold the items of the
+    // payload's named-parens pattern directly, `B(X: x, Y: y)`
+    // standing for `B((X: x, Y: y))`; the colons tell that spelling
+    // from the positional one, and both are admitted. **A variant
+    // that takes no payload is read by its bare name**, and that an
+    // arm's parens agree with the roster, elaboration states.
     match_arm: ($) =>
       seq(
         field("variant", $.identifier),
-        "(",
-        choice(
+        optional(
           seq(
-            repeat(choice(",", $._newline)),
-            $.named_sub_pattern,
-            repeat(seq(repeat1(choice(",", $._newline)), $.named_sub_pattern)),
-            repeat(choice(",", $._newline)),
+            "(",
+            choice(
+              seq(
+                repeat(choice(",", $._newline)),
+                $.named_sub_pattern,
+                repeat(
+                  seq(repeat1(choice(",", $._newline)), $.named_sub_pattern),
+                ),
+                repeat(choice(",", $._newline)),
+              ),
+              field("pattern", $._pattern),
+            ),
+            ")",
           ),
-          field("pattern", $._pattern),
         ),
-        ")",
         "then",
         repeat($._newline),
         field("body", $._expression),

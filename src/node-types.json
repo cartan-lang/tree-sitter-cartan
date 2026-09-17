@@ -3356,6 +3356,16 @@
     "type": "fiber_declaration",
     "named": true,
     "fields": {
+      "algebra": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
       "component": {
         "multiple": true,
         "required": false,
@@ -5993,58 +6003,6 @@
     }
   },
   {
-    "type": "module_definition",
-    "named": true,
-    "fields": {
-      "holes": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "hole_list",
-            "named": true
-          }
-        ]
-      },
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "binding",
-          "named": true
-        },
-        {
-          "type": "doc_declaration",
-          "named": true
-        },
-        {
-          "type": "fiber_declaration",
-          "named": true
-        },
-        {
-          "type": "function_definition",
-          "named": true
-        },
-        {
-          "type": "pattern_binding",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "named_pattern",
     "named": true,
     "fields": {},
@@ -6103,6 +6061,58 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "namespace_definition",
+    "named": true,
+    "fields": {
+      "holes": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "hole_list",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "binding",
+          "named": true
+        },
+        {
+          "type": "doc_declaration",
+          "named": true
+        },
+        {
+          "type": "fiber_declaration",
+          "named": true
+        },
+        {
+          "type": "function_definition",
+          "named": true
+        },
+        {
+          "type": "pattern_binding",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -6740,7 +6750,7 @@
         "required": true,
         "types": [
           {
-            "type": "port",
+            "type": "param",
             "named": false
           },
           {
@@ -7986,7 +7996,7 @@
           "named": true
         },
         {
-          "type": "module_definition",
+          "type": "namespace_definition",
           "named": true
         },
         {
@@ -8756,7 +8766,7 @@
       },
       "type": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "fiber_type",
@@ -9467,10 +9477,6 @@
     "named": false
   },
   {
-    "type": "affine",
-    "named": false
-  },
-  {
     "type": "and",
     "named": false
   },
@@ -9556,7 +9562,7 @@
     "named": false
   },
   {
-    "type": "module",
+    "type": "namespace",
     "named": false
   },
   {
@@ -9580,7 +9586,7 @@
     "named": false
   },
   {
-    "type": "port",
+    "type": "param",
     "named": false
   },
   {
@@ -9613,6 +9619,10 @@
   },
   {
     "type": "then",
+    "named": false
+  },
+  {
+    "type": "torsor",
     "named": false
   },
   {
