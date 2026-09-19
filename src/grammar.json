@@ -2239,6 +2239,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "periodic_expression"
+        },
+        {
+          "type": "SYMBOL",
           "name": "binary_expression"
         },
         {
@@ -2590,6 +2594,27 @@
               "type": "SYMBOL",
               "name": "_expression"
             }
+          }
+        ]
+      }
+    },
+    "periodic_expression": {
+      "type": "PREC_LEFT",
+      "value": 1,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "axis",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_expression"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "periodic"
           }
         ]
       }
@@ -3535,6 +3560,15 @@
             "type": "ALIAS",
             "content": {
               "type": "SYMBOL",
+              "name": "periodic_expression_1"
+            },
+            "named": true,
+            "value": "periodic_expression"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
               "name": "binary_expression_1"
             },
             "named": true,
@@ -3907,6 +3941,27 @@
               "type": "SYMBOL",
               "name": "_expression_1"
             }
+          }
+        ]
+      }
+    },
+    "periodic_expression_1": {
+      "type": "PREC_LEFT",
+      "value": 3,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "axis",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_expression_1"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "periodic"
           }
         ]
       }
@@ -4709,6 +4764,15 @@
             "type": "ALIAS",
             "content": {
               "type": "SYMBOL",
+              "name": "periodic_expression_2"
+            },
+            "named": true,
+            "value": "periodic_expression"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
               "name": "binary_expression_2"
             },
             "named": true,
@@ -5090,6 +5154,27 @@
               "type": "SYMBOL",
               "name": "_expression_2"
             }
+          }
+        ]
+      }
+    },
+    "periodic_expression_2": {
+      "type": "PREC_LEFT",
+      "value": 3,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "FIELD",
+            "name": "axis",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_expression_2"
+            }
+          },
+          {
+            "type": "STRING",
+            "value": "periodic"
           }
         ]
       }
@@ -5951,6 +6036,27 @@
                       "name": "identifier"
                     }
                   ]
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "arguments",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "argument_list"
+                }
+              }
+            ]
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "function",
+                "content": {
+                  "type": "STRING",
+                  "value": "periodic"
                 }
               },
               {

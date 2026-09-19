@@ -655,6 +655,7 @@ module.exports = grammar({
         $.conditional_expression,
         $.unary_expression,
         $.range_expression,
+        $.periodic_expression,
         $.binary_expression,
         $.with_expression,
         $.but_expression,
@@ -756,6 +757,13 @@ module.exports = grammar({
           field("right", $._expression),
         ),
       ),
+
+    // `0..n periodic` — the box axis that wraps (R:periodic-box). It
+    // stands on a range and nowhere else, so it reads at the range's own
+    // precedence and the lowering refuses it on anything but a range: the
+    // word states an axis of a box, and a box's axis is a range.
+    periodic_expression: ($) =>
+      prec.left(1, seq(field("axis", $._expression), "periodic")),
 
     // the comparisons group left here, and the lowering refuses a chain
     // — `a < b < c` is two comparisons and says so
@@ -1008,6 +1016,7 @@ module.exports = grammar({
           alias($.conditional_expression_1, $.conditional_expression),
           alias($.unary_expression_1, $.unary_expression),
           alias($.range_expression_1, $.range_expression),
+          alias($.periodic_expression_1, $.periodic_expression),
           alias($.binary_expression_1, $.binary_expression),
           alias($.with_expression_1, $.with_expression),
           alias($.but_expression_1, $.but_expression),
@@ -1092,6 +1101,9 @@ module.exports = grammar({
           field("right", $._expression_1),
         ),
       ),
+
+    periodic_expression_1: ($) =>
+      prec.left(3, seq(field("axis", $._expression_1), "periodic")),
 
     binary_expression_1: ($) =>
       choice(
@@ -1268,6 +1280,7 @@ module.exports = grammar({
           alias($.conditional_expression_2, $.conditional_expression),
           alias($.unary_expression_2, $.unary_expression),
           alias($.range_expression_2, $.range_expression),
+          alias($.periodic_expression_2, $.periodic_expression),
           alias($.binary_expression_2, $.binary_expression),
           alias($.with_expression_2, $.with_expression),
           alias($.but_expression_2, $.but_expression),
@@ -1353,6 +1366,9 @@ module.exports = grammar({
           field("right", $._expression_2),
         ),
       ),
+
+    periodic_expression_2: ($) =>
+      prec.left(3, seq(field("axis", $._expression_2), "periodic")),
 
     binary_expression_2: ($) =>
       choice(
@@ -1546,6 +1562,10 @@ module.exports = grammar({
           ),
           seq(
             field("function", choice($.qualified_identifier, $.identifier)),
+            field("arguments", $.argument_list),
+          ),
+          seq(
+            field("function", "periodic"),
             field("arguments", $.argument_list),
           ),
           prec.dynamic(
