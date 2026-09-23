@@ -1725,6 +1725,10 @@
             "named": true
           },
           {
+            "type": "locked",
+            "named": false
+          },
+          {
             "type": "periodic",
             "named": false
           },
@@ -3541,6 +3545,10 @@
           {
             "type": "identifier",
             "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
           }
         ]
       },
@@ -5155,6 +5163,146 @@
         ]
       },
       "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "site",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "lock_clause",
+    "named": true,
+    "fields": {
+      "condition": {
         "multiple": false,
         "required": true,
         "types": [
@@ -7068,6 +7216,16 @@
           {
             "type": "state",
             "named": false
+          }
+        ]
+      },
+      "lock": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "lock_clause",
+            "named": true
           }
         ]
       },
@@ -9926,6 +10084,10 @@
     "named": false
   },
   {
+    "type": "locked",
+    "named": false
+  },
+  {
     "type": "mark",
     "named": true
   },
@@ -10011,6 +10173,10 @@
   },
   {
     "type": "use",
+    "named": false
+  },
+  {
+    "type": "when",
     "named": false
   },
   {

@@ -2519,3 +2519,75 @@ param p = 1
   (port_declaration
     name: (identifier)
     value: (number)))
+
+================================================================
+an annotation names a used document's fiber through its namespace
+================================================================
+
+f(z: orbit::Binary) = z
+state w: orbit::Binary|None = none
+zs: List<orbit::Binary> = []
+
+----------------------------------------------------------------
+
+(source_file
+  (function_definition
+    name: (identifier)
+    parameters: (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type_annotation
+          (fiber_type
+            name: (qualified_identifier
+              namespace: (identifier)
+              name: (identifier))))))
+    body: (identifier))
+  (port_declaration
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (qualified_identifier
+          namespace: (identifier)
+          name: (identifier)))
+      alternative: (fiber_type
+        name: (identifier)))
+    value: (none))
+  (binding
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (identifier)
+        (fiber_type
+          name: (qualified_identifier
+            namespace: (identifier)
+            name: (identifier)))))
+    value: (list)))
+
+================================================================
+a param states when it is locked, and the same word heads its reader
+================================================================
+
+param res: Int = 100 (locked when physics != none)
+shade = if locked(res) then 1 else 0
+
+----------------------------------------------------------------
+
+(source_file
+  (port_declaration
+    name: (identifier)
+    type: (type_annotation
+      (fiber_type
+        name: (identifier)))
+    value: (number)
+    lock: (lock_clause
+      condition: (binary_expression
+        left: (identifier)
+        right: (none))))
+  (binding
+    name: (identifier)
+    value: (conditional_expression
+      condition: (call_expression
+        arguments: (argument_list
+          (identifier)))
+      consequence: (number)
+      alternative: (number))))

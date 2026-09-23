@@ -263,6 +263,12 @@ module.exports = grammar({
     // to the run. A port states an optional fiber after `:`,
     // `state x: Vector<Real, 2>|None = vec(0, 0)`, and the initial is
     // held to it (R:stated-fiber).
+    // 
+    // **A parenthetical after the initial states when the port is
+    // locked** (R:locked-param): `param res: Int = 100 (locked when
+    // physics != none)`. It belongs to a `param`, whose three writers
+    // a lock reaches; a `state` belongs to the run, and the parser
+    // states that where one writes the clause.
     port_declaration: ($) =>
       seq(
         field("kind", choice("param", "state")),
@@ -271,6 +277,23 @@ module.exports = grammar({
         "=",
         repeat($._newline),
         field("value", $._expression),
+        optional(field("lock", $.lock_clause)),
+      ),
+
+    // `(locked when physics != none)` — the parenthetical a `param`
+    // writes after its initial to state the condition under which it
+    // is locked (R:locked-param). The condition is an ordinary Bool
+    // expression of the document, elaborated into the graph like any
+    // other and read live, so a lock states itself at the declaration
+    // rather than being inferred from what a run did.
+    lock_clause: ($) =>
+      seq(
+        "(",
+        "locked",
+        "when",
+        repeat($._newline),
+        field("condition", $._expression),
+        ")",
       ),
 
     // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)`,
@@ -408,7 +431,9 @@ module.exports = grammar({
     // widths — `Real`, `Vector<Real, 2>`, `Site<3>` — or a product's
     // components or a sum's variants stated in the open, either of
     // which stands wherever an alias does (R:product-fiber,
-    // R:sum-fiber). The lookahead before the components is the
+    // R:sum-fiber). **The name is qualified where a call head's
+    // is** (spec §10), `orbit::Binary` naming a used document's
+    // fiber. The lookahead before the components is the
     // interpreter's alone, as `described_head`'s is: a `component`
     // states its own sentence for a missing `:`, and the parenthesized
     // description is one of three readings of a paren, so the sentence
@@ -447,7 +472,7 @@ module.exports = grammar({
         ),
         field("entries", $.struct_type),
         seq(
-          field("name", $.identifier),
+          field("name", choice($.qualified_identifier, $.identifier)),
           optional(
             seq(
               "<",
@@ -1568,6 +1593,7 @@ module.exports = grammar({
             field("function", "periodic"),
             field("arguments", $.argument_list),
           ),
+          seq(field("function", "locked"), field("arguments", $.argument_list)),
           prec.dynamic(
             2,
             seq(
