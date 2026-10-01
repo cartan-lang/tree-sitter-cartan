@@ -428,7 +428,9 @@ module.exports = grammar({
       ),
 
     // A fiber type: a name with optional `<…>` arguments, types or
-    // widths — `Real`, `Vector<Real, 2>`, `Site<3>` — or a product's
+    // widths — `Real`, `Vector<Real, 2>`, `Site<3>`, a type taking the
+    // absence alternative, `List<Real|None>`, where the lowering admits
+    // an entry that may be absent — or a product's
     // components or a sum's variants stated in the open, either of
     // which stands wherever an alias does (R:product-fiber,
     // R:sum-fiber). **The name is qualified where a call head's
@@ -479,11 +481,11 @@ module.exports = grammar({
               repeat(choice(",", $._newline)),
               optional(
                 seq(
-                  choice($.fiber_type, $.number),
+                  choice($.type_annotation, $.number),
                   repeat(
                     seq(
                       repeat1(choice(",", $._newline)),
-                      choice($.fiber_type, $.number),
+                      choice($.type_annotation, $.number),
                     ),
                   ),
                   repeat(choice(",", $._newline)),
@@ -746,7 +748,7 @@ module.exports = grammar({
           ),
         ),
         prec(
-          8,
+          9,
           seq(
             field("operator", "-"),
             repeat($._newline),
@@ -754,7 +756,7 @@ module.exports = grammar({
           ),
         ),
         prec(
-          8,
+          9,
           seq(
             field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
             repeat($._newline),
@@ -792,6 +794,11 @@ module.exports = grammar({
 
     // the comparisons group left here, and the lowering refuses a chain
     // — `a < b < c` is two comparisons and says so
+    // `x ?? y` — the presence default (R:absence-flow): `x` where it is
+    // present, `y` where it is absent. It groups right, so defaults chain,
+    // and stands between the comparisons and arithmetic, so `m ?? 0 > 3` is
+    // `(m ?? 0) > 3` and `m ?? n + 1` is `m ?? (n + 1)`. The lexer's longest
+    // match takes it over the postfix absence mark `?`.
     // `a <> b` — the join: the string two strings make, the list two
     // lists make end to end, the union two Maps make. It stands at `+`'s
     // precedence and groups left, and it is a continuation operator, so a
@@ -848,8 +855,17 @@ module.exports = grammar({
             field("right", $._expression),
           ),
         ),
-        prec.left(
+        prec.right(
           6,
+          seq(
+            field("left", $._expression),
+            field("operator", alias(token(/(\n[ \t\r]*)*\?\?/), "??")),
+            repeat($._newline),
+            field("right", $._expression),
+          ),
+        ),
+        prec.left(
+          7,
           seq(
             field("left", $._expression),
             field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
@@ -858,7 +874,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          6,
+          7,
           seq(
             field("left", $._expression),
             field("operator", alias(token(/(\n[ \t\r]*)*<>/), "<>")),
@@ -867,7 +883,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          6,
+          7,
           seq(
             field("left", $._expression),
             field("operator", "-"),
@@ -876,7 +892,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          7,
+          8,
           seq(
             field("left", $._expression),
             field(
@@ -892,7 +908,7 @@ module.exports = grammar({
           ),
         ),
         prec.right(
-          9,
+          10,
           seq(
             field("left", $._expression),
             field("operator", alias(token(/(\n[ \t\r]*)*\^/), "^")),
@@ -907,7 +923,7 @@ module.exports = grammar({
     // — and not a further `with`, so the chain stays flat.
     with_expression: ($) =>
       prec.left(
-        10,
+        11,
         seq(
           field("target", $._expression),
           choice("with", alias(token(/(\n[ \t\r]*)+with[ \t\r\n]/), "with")),
@@ -921,7 +937,7 @@ module.exports = grammar({
     // override names replaced, at `with`'s precedence and grouping left.
     but_expression: ($) =>
       prec.left(
-        10,
+        11,
         seq(
           field("target", $._expression),
           choice("but", alias(token(/(\n[ \t\r]*)+but[ \t\r\n]/), "but")),
@@ -934,11 +950,11 @@ module.exports = grammar({
     // the slot it stands on licenses absence. It rides the postfix chain,
     // so a call result marks too — `points(vec(x, y)?)`.
     absent_expression: ($) =>
-      prec.left(12, seq(field("value", $._expression), "?")),
+      prec.left(13, seq(field("value", $._expression), "?")),
 
     index_expression: ($) =>
       prec.left(
-        12,
+        13,
         seq(field("target", $._expression), field("index", $.subscript)),
       ),
 
@@ -951,7 +967,7 @@ module.exports = grammar({
     // component and then that value's.
     component_expression: ($) =>
       prec.right(
-        11,
+        12,
         seq(
           field("key", $.component_key),
           "of",
@@ -969,7 +985,7 @@ module.exports = grammar({
         prec.dynamic(
           1,
           prec.left(
-            12,
+            13,
             seq(
               field("target", choice($.config_expression)),
               alias(token(/(\n[ \t\r]*)*:/), ":"),
@@ -978,7 +994,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          12,
+          13,
           seq(
             field("target", $._expression),
             alias(token(/(\n[ \t\r]*)*:/), ":"),
@@ -998,11 +1014,11 @@ module.exports = grammar({
     payload_expression: ($) =>
       choice(
         prec.left(
-          12,
+          13,
           seq(field("target", $._expression), field("body", $.body)),
         ),
         prec.left(
-          12,
+          13,
           seq(field("target", $._expression), field("body", $.list)),
         ),
       ),
@@ -1093,7 +1109,7 @@ module.exports = grammar({
           ),
         ),
         prec(
-          17,
+          19,
           seq(
             field("operator", "-"),
             repeat($._newline),
@@ -1101,7 +1117,7 @@ module.exports = grammar({
           ),
         ),
         prec(
-          17,
+          19,
           seq(
             field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
             repeat($._newline),
@@ -1175,8 +1191,17 @@ module.exports = grammar({
             field("right", $._expression_1),
           ),
         ),
-        prec.left(
+        prec.right(
           13,
+          seq(
+            field("left", $._expression_1),
+            field("operator", alias(token(/(\n[ \t\r]*)*\?\?/), "??")),
+            repeat($._newline),
+            field("right", $._expression_1),
+          ),
+        ),
+        prec.left(
+          15,
           seq(
             field("left", $._expression_1),
             field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
@@ -1185,7 +1210,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          13,
+          15,
           seq(
             field("left", $._expression_1),
             field("operator", alias(token(/(\n[ \t\r]*)*<>/), "<>")),
@@ -1194,7 +1219,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          13,
+          15,
           seq(
             field("left", $._expression_1),
             field("operator", "-"),
@@ -1203,7 +1228,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          15,
+          17,
           seq(
             field("left", $._expression_1),
             field(
@@ -1219,7 +1244,7 @@ module.exports = grammar({
           ),
         ),
         prec.right(
-          19,
+          21,
           seq(
             field("left", $._expression_1),
             field("operator", alias(token(/(\n[ \t\r]*)*\^/), "^")),
@@ -1231,7 +1256,7 @@ module.exports = grammar({
 
     with_expression_1: ($) =>
       prec.left(
-        21,
+        23,
         seq(
           field("target", $._expression_1),
           choice("with", alias(token(/(\n[ \t\r]*)+with[ \t\r\n]/), "with")),
@@ -1242,7 +1267,7 @@ module.exports = grammar({
 
     but_expression_1: ($) =>
       prec.left(
-        21,
+        23,
         seq(
           field("target", $._expression_1),
           choice("but", alias(token(/(\n[ \t\r]*)+but[ \t\r\n]/), "but")),
@@ -1252,17 +1277,17 @@ module.exports = grammar({
       ),
 
     absent_expression_1: ($) =>
-      prec.left(25, seq(field("value", $._expression_1), "?")),
+      prec.left(27, seq(field("value", $._expression_1), "?")),
 
     index_expression_1: ($) =>
       prec.left(
-        25,
+        27,
         seq(field("target", $._expression_1), field("index", $.subscript)),
       ),
 
     component_expression_1: ($) =>
       prec.right(
-        23,
+        25,
         seq(
           field("key", $.component_key),
           "of",
@@ -1358,7 +1383,7 @@ module.exports = grammar({
           ),
         ),
         prec(
-          17,
+          19,
           seq(
             field("operator", "-"),
             repeat($._newline),
@@ -1366,7 +1391,7 @@ module.exports = grammar({
           ),
         ),
         prec(
-          17,
+          19,
           seq(
             field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
             repeat($._newline),
@@ -1440,8 +1465,17 @@ module.exports = grammar({
             field("right", $._expression_2),
           ),
         ),
-        prec.left(
+        prec.right(
           13,
+          seq(
+            field("left", $._expression_2),
+            field("operator", alias(token(/(\n[ \t\r]*)*\?\?/), "??")),
+            repeat($._newline),
+            field("right", $._expression_2),
+          ),
+        ),
+        prec.left(
+          15,
           seq(
             field("left", $._expression_2),
             field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
@@ -1450,7 +1484,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          13,
+          15,
           seq(
             field("left", $._expression_2),
             field("operator", alias(token(/(\n[ \t\r]*)*<>/), "<>")),
@@ -1459,7 +1493,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          13,
+          15,
           seq(
             field("left", $._expression_2),
             field("operator", "-"),
@@ -1468,7 +1502,7 @@ module.exports = grammar({
           ),
         ),
         prec.left(
-          15,
+          17,
           seq(
             field("left", $._expression_2),
             field(
@@ -1484,7 +1518,7 @@ module.exports = grammar({
           ),
         ),
         prec.right(
-          19,
+          21,
           seq(
             field("left", $._expression_2),
             field("operator", alias(token(/(\n[ \t\r]*)*\^/), "^")),
@@ -1496,7 +1530,7 @@ module.exports = grammar({
 
     with_expression_2: ($) =>
       prec.left(
-        21,
+        23,
         seq(
           field("target", $._expression_2),
           choice("with", alias(token(/(\n[ \t\r]*)+with[ \t\r\n]/), "with")),
@@ -1507,7 +1541,7 @@ module.exports = grammar({
 
     but_expression_2: ($) =>
       prec.left(
-        21,
+        23,
         seq(
           field("target", $._expression_2),
           choice("but", alias(token(/(\n[ \t\r]*)+but[ \t\r\n]/), "but")),
@@ -1517,17 +1551,17 @@ module.exports = grammar({
       ),
 
     absent_expression_2: ($) =>
-      prec.left(25, seq(field("value", $._expression_2), "?")),
+      prec.left(27, seq(field("value", $._expression_2), "?")),
 
     index_expression_2: ($) =>
       prec.left(
-        25,
+        27,
         seq(field("target", $._expression_2), field("index", $.subscript)),
       ),
 
     component_expression_2: ($) =>
       prec.right(
-        23,
+        25,
         seq(
           field("key", $.component_key),
           "of",
@@ -1539,11 +1573,11 @@ module.exports = grammar({
     payload_expression_2: ($) =>
       choice(
         prec.left(
-          25,
+          27,
           seq(field("target", $._expression_2), field("body", $.body)),
         ),
         prec.left(
-          25,
+          27,
           seq(field("target", $._expression_2), field("body", $.list)),
         ),
       ),
@@ -2124,7 +2158,7 @@ module.exports = grammar({
     // decides which (R:component-key, R:product-fit).
     product_component: ($) =>
       prec(
-        13,
+        14,
         seq(
           field("name", choice($.identifier, $.number, $.site)),
           ":",

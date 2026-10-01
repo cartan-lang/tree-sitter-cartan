@@ -1564,7 +1564,7 @@
                               "members": [
                                 {
                                   "type": "SYMBOL",
-                                  "name": "fiber_type"
+                                  "name": "type_annotation"
                                 },
                                 {
                                   "type": "SYMBOL",
@@ -1598,7 +1598,7 @@
                                     "members": [
                                       {
                                         "type": "SYMBOL",
-                                        "name": "fiber_type"
+                                        "name": "type_annotation"
                                       },
                                       {
                                         "type": "SYMBOL",
@@ -2522,7 +2522,7 @@
         },
         {
           "type": "PREC",
-          "value": 8,
+          "value": 9,
           "content": {
             "type": "SEQ",
             "members": [
@@ -2554,7 +2554,7 @@
         },
         {
           "type": "PREC",
-          "value": 8,
+          "value": 9,
           "content": {
             "type": "SEQ",
             "members": [
@@ -2911,8 +2911,56 @@
           }
         },
         {
-          "type": "PREC_LEFT",
+          "type": "PREC_RIGHT",
           "value": 6,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "left",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "operator",
+                "content": {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "TOKEN",
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "(\\n[ \\t\\r]*)*\\?\\?"
+                    }
+                  },
+                  "named": false,
+                  "value": "??"
+                }
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_newline"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "right",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "PREC_LEFT",
+          "value": 7,
           "content": {
             "type": "SEQ",
             "members": [
@@ -2960,7 +3008,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 6,
+          "value": 7,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3008,7 +3056,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 6,
+          "value": 7,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3048,7 +3096,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 7,
+          "value": 8,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3125,7 +3173,7 @@
         },
         {
           "type": "PREC_RIGHT",
-          "value": 9,
+          "value": 10,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3175,7 +3223,7 @@
     },
     "with_expression": {
       "type": "PREC_LEFT",
-      "value": 10,
+      "value": 11,
       "content": {
         "type": "SEQ",
         "members": [
@@ -3228,7 +3276,7 @@
     },
     "but_expression": {
       "type": "PREC_LEFT",
-      "value": 10,
+      "value": 11,
       "content": {
         "type": "SEQ",
         "members": [
@@ -3281,7 +3329,7 @@
     },
     "absent_expression": {
       "type": "PREC_LEFT",
-      "value": 12,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -3302,7 +3350,7 @@
     },
     "index_expression": {
       "type": "PREC_LEFT",
-      "value": 12,
+      "value": 13,
       "content": {
         "type": "SEQ",
         "members": [
@@ -3327,7 +3375,7 @@
     },
     "component_expression": {
       "type": "PREC_RIGHT",
-      "value": 11,
+      "value": 12,
       "content": {
         "type": "SEQ",
         "members": [
@@ -3369,7 +3417,7 @@
           "value": 1,
           "content": {
             "type": "PREC_LEFT",
-            "value": 12,
+            "value": 13,
             "content": {
               "type": "SEQ",
               "members": [
@@ -3412,7 +3460,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 12,
+          "value": 13,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3454,7 +3502,7 @@
       "members": [
         {
           "type": "PREC_LEFT",
-          "value": 12,
+          "value": 13,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3479,7 +3527,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 12,
+          "value": 13,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3869,7 +3917,7 @@
         },
         {
           "type": "PREC",
-          "value": 17,
+          "value": 19,
           "content": {
             "type": "SEQ",
             "members": [
@@ -3901,7 +3949,7 @@
         },
         {
           "type": "PREC",
-          "value": 17,
+          "value": 19,
           "content": {
             "type": "SEQ",
             "members": [
@@ -4258,8 +4306,56 @@
           }
         },
         {
-          "type": "PREC_LEFT",
+          "type": "PREC_RIGHT",
           "value": 13,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "left",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression_1"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "operator",
+                "content": {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "TOKEN",
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "(\\n[ \\t\\r]*)*\\?\\?"
+                    }
+                  },
+                  "named": false,
+                  "value": "??"
+                }
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_newline"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "right",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression_1"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "PREC_LEFT",
+          "value": 15,
           "content": {
             "type": "SEQ",
             "members": [
@@ -4307,7 +4403,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 13,
+          "value": 15,
           "content": {
             "type": "SEQ",
             "members": [
@@ -4355,7 +4451,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 13,
+          "value": 15,
           "content": {
             "type": "SEQ",
             "members": [
@@ -4395,7 +4491,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 15,
+          "value": 17,
           "content": {
             "type": "SEQ",
             "members": [
@@ -4472,7 +4568,7 @@
         },
         {
           "type": "PREC_RIGHT",
-          "value": 19,
+          "value": 21,
           "content": {
             "type": "SEQ",
             "members": [
@@ -4522,7 +4618,7 @@
     },
     "with_expression_1": {
       "type": "PREC_LEFT",
-      "value": 21,
+      "value": 23,
       "content": {
         "type": "SEQ",
         "members": [
@@ -4575,7 +4671,7 @@
     },
     "but_expression_1": {
       "type": "PREC_LEFT",
-      "value": 21,
+      "value": 23,
       "content": {
         "type": "SEQ",
         "members": [
@@ -4628,7 +4724,7 @@
     },
     "absent_expression_1": {
       "type": "PREC_LEFT",
-      "value": 25,
+      "value": 27,
       "content": {
         "type": "SEQ",
         "members": [
@@ -4649,7 +4745,7 @@
     },
     "index_expression_1": {
       "type": "PREC_LEFT",
-      "value": 25,
+      "value": 27,
       "content": {
         "type": "SEQ",
         "members": [
@@ -4674,7 +4770,7 @@
     },
     "component_expression_1": {
       "type": "PREC_RIGHT",
-      "value": 23,
+      "value": 25,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5082,7 +5178,7 @@
         },
         {
           "type": "PREC",
-          "value": 17,
+          "value": 19,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5114,7 +5210,7 @@
         },
         {
           "type": "PREC",
-          "value": 17,
+          "value": 19,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5471,8 +5567,56 @@
           }
         },
         {
-          "type": "PREC_LEFT",
+          "type": "PREC_RIGHT",
           "value": 13,
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "FIELD",
+                "name": "left",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression_2"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "operator",
+                "content": {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "TOKEN",
+                    "content": {
+                      "type": "PATTERN",
+                      "value": "(\\n[ \\t\\r]*)*\\?\\?"
+                    }
+                  },
+                  "named": false,
+                  "value": "??"
+                }
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_newline"
+                }
+              },
+              {
+                "type": "FIELD",
+                "name": "right",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_expression_2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "PREC_LEFT",
+          "value": 15,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5520,7 +5664,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 13,
+          "value": 15,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5568,7 +5712,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 13,
+          "value": 15,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5608,7 +5752,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 15,
+          "value": 17,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5685,7 +5829,7 @@
         },
         {
           "type": "PREC_RIGHT",
-          "value": 19,
+          "value": 21,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5735,7 +5879,7 @@
     },
     "with_expression_2": {
       "type": "PREC_LEFT",
-      "value": 21,
+      "value": 23,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5788,7 +5932,7 @@
     },
     "but_expression_2": {
       "type": "PREC_LEFT",
-      "value": 21,
+      "value": 23,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5841,7 +5985,7 @@
     },
     "absent_expression_2": {
       "type": "PREC_LEFT",
-      "value": 25,
+      "value": 27,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5862,7 +6006,7 @@
     },
     "index_expression_2": {
       "type": "PREC_LEFT",
-      "value": 25,
+      "value": 27,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5887,7 +6031,7 @@
     },
     "component_expression_2": {
       "type": "PREC_RIGHT",
-      "value": 23,
+      "value": 25,
       "content": {
         "type": "SEQ",
         "members": [
@@ -5926,7 +6070,7 @@
       "members": [
         {
           "type": "PREC_LEFT",
-          "value": 25,
+          "value": 27,
           "content": {
             "type": "SEQ",
             "members": [
@@ -5951,7 +6095,7 @@
         },
         {
           "type": "PREC_LEFT",
-          "value": 25,
+          "value": 27,
           "content": {
             "type": "SEQ",
             "members": [
@@ -8210,7 +8354,7 @@
     },
     "product_component": {
       "type": "PREC",
-      "value": 13,
+      "value": 14,
       "content": {
         "type": "SEQ",
         "members": [

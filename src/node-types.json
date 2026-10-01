@@ -914,6 +914,10 @@
             "named": false
           },
           {
+            "type": "??",
+            "named": false
+          },
+          {
             "type": "@",
             "named": false
           },
@@ -3568,11 +3572,11 @@
       "required": false,
       "types": [
         {
-          "type": "fiber_type",
+          "type": "number",
           "named": true
         },
         {
-          "type": "number",
+          "type": "type_annotation",
           "named": true
         }
       ]
@@ -9988,6 +9992,10 @@
   },
   {
     "type": "?",
+    "named": false
+  },
+  {
+    "type": "??",
     "named": false
   },
   {
