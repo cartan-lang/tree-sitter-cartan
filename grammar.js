@@ -21,7 +21,9 @@
  * infix operator continues the line above: such an operator is one
  * token carrying its leading newlines, aliased to the operator, so
  * the longest match at a line end takes it over the separator.
- * `-` is not one, so `[1\n -2\n 3]` keeps its three items. A word
+ * A token that can begin an expression is not one, so
+ * `[1\n -2\n 3]` keeps its three items and `[0..4\n ..8]` its two
+ * axes. A word
  * operator opening a line — `with`, `but`, `and`, `or` — takes one
  * whitespace character after the word in its token, which is what
  * keeps `without = 2` on a fresh line a binding.
@@ -37,12 +39,14 @@ module.exports = grammar({
   conflicts: ($) => [
     [$._expression, $.for_expression],
     [$._expression, $.each_expression],
-    [$._expression, $.clause],
+    [$.header_open_range],
+    [$.range_expression_1, $.header_open_range],
     [$._config_atom, $._expression],
     [$._expression, $._pattern],
     [$._expression, $.map_sub_pattern],
     [$._expression, $.map_walk],
     [$._expression, $.component_key],
+    [$._expression, $.component_key, $.position_pair],
     [$.fiber_type, $._pattern],
     [$.fiber_type, $._expression],
     [$.fiber_type, $._expression, $._pattern],
@@ -296,28 +300,26 @@ module.exports = grammar({
         ")",
       ),
 
-    // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)`,
-    // `fiber Shape = (A: Real | B: Vector<Real, 3>)` and
-    // `fiber Instant = torsor Real` — a fiber declaration: a
-    // product's components separated by `,` (R:product-fiber), a
-    // sum's variants separated by `|` (R:sum-fiber), each a name and
-    // a fiber type inside the named parens the value form already
-    // uses — a variant written as a bare name taking no payload,
-    // so `fiber Mode = (Binary | Single)` is an enumeration — or
-    // the module fiber a torsor's points differ by
-    // (R:affine-fiber). A product states at least one component and
-    // a sum at least two variants, and no name twice, which the
-    // lowering states. `fiber Space<k> = (start: Site<k>, extent:
-    // Extent<k>)` names a width parameter after the name, which the
-    // component fibers read (R:product-fiber).
+    // `fiber Cons = (D: Real, S: Vector<Real, 2>, tau: Real)` and
+    // `fiber Shape = (A: Real | B: Vector<Real, 3>)` — a fiber
+    // declaration: a product's components separated by `,`
+    // (R:product-fiber), a sum's variants separated by `|`
+    // (R:sum-fiber), each a name and a fiber type inside the named
+    // parens the value form already uses — a variant written as a
+    // bare name taking no payload, so `fiber Mode = (Binary |
+    // Single)` is an enumeration. A product states at least one
+    // component and a sum at least two variants, and no name twice,
+    // which the lowering states. `fiber Cell<k> = (at: [Int; k],
+    // v: Vector<Real, k>)` names a width parameter after the name,
+    // which the component fibers read (R:product-fiber).
     // 
     // **A declared product states its algebra after `:`**
     // (R:fiber-algebra): `fiber Conserved: Module = (…)` admits
     // componentwise addition, negation and scaling, `fiber
     // Primitive: Algebra = (…)` the componentwise product of two
     // values besides, and a declaration writing no word is a set
-    // every arithmetic operator refuses on. A sum and a torsor
-    // state no word, each carrying a structure of its own.
+    // every arithmetic operator refuses on. A sum states no word,
+    // its structure being the active variant's.
     fiber_declaration: ($) =>
       seq(
         "fiber",
@@ -356,7 +358,6 @@ module.exports = grammar({
             ),
             ")",
           ),
-          seq("torsor", field("module", $.fiber_type)),
         ),
       ),
 
@@ -428,7 +429,8 @@ module.exports = grammar({
       ),
 
     // A fiber type: a name with optional `<…>` arguments, types or
-    // widths — `Real`, `Vector<Real, 2>`, `Site<3>`, a type taking the
+    // widths — `Real`, `Vector<Real, 2>`, `Mat<3, 3>`, a static list
+    // kind `[Int; 2]` (`static_list_type`), a type taking the
     // absence alternative, `List<Real|None>`, where the lowering admits
     // an entry that may be absent — or a product's
     // components or a sum's variants stated in the open, either of
@@ -473,6 +475,7 @@ module.exports = grammar({
           ")",
         ),
         field("entries", $.struct_type),
+        field("list", $.static_list_type),
         seq(
           field("name", choice($.qualified_identifier, $.identifier)),
           optional(
@@ -494,6 +497,29 @@ module.exports = grammar({
               ">",
             ),
           ),
+        ),
+      ),
+
+    // `[Int; 2]` and `[Int, Real]` — a static list kind (R:box-as-ranges):
+    // the repeated form states one entry kind and a width — a number, a
+    // declaration's width parameter, or `_` for any — and the concrete
+    // form one kind per position, at least one, which is sugar for the
+    // repeated form where its entries agree. The brackets are positional
+    // as a List literal's are, and the length is a fact of the kind.
+    static_list_type: ($) =>
+      choice(
+        seq(
+          "[",
+          field("item", $.fiber_type),
+          ";",
+          field("width", choice($.number, $.identifier)),
+          "]",
+        ),
+        seq(
+          "[",
+          field("item", $.fiber_type),
+          repeat(seq(",", field("item", $.fiber_type))),
+          "]",
         ),
       ),
 
@@ -537,7 +563,7 @@ module.exports = grammar({
     // keeps a triple string standing alone the prose it is.
     bare_expression: ($) => field("value", $._expression),
 
-    // `(D: D) = U`, `(i, j) = s` and `{ rho, vel } = m` — a top-level
+    // `(D: D) = U`, `[i, j] = s` and `{ rho, vel } = m` — a top-level
     // pattern item (spec §4, §2.10): each name the pattern binds is a
     // document name holding that component, exported through a `use`
     // alias as any other document name is, and a field of products
@@ -547,7 +573,7 @@ module.exports = grammar({
     // is, and elaboration tells the two apart by what the head names.
     pattern_binding: ($) =>
       seq(
-        field("pattern", choice($.named_pattern, $.site_pattern, $.map_pattern)),
+        field("pattern", choice($.named_pattern, $.list_pattern, $.map_pattern)),
         "=",
         repeat($._newline),
         field("value", $._expression),
@@ -592,12 +618,26 @@ module.exports = grammar({
     // other (wishlist item 71). The annotation and the default stand on
     // the whole slot. That only a trailing run declares defaults, that a
     // default stands on a bare name, and that `None` is the one
-    // alternative an annotation takes, the lowering states.
+    // alternative an annotation takes, the lowering states. A
+    // positional tuple stands only with the fiber it reads stated after
+    // it, `(rho, _, pre): Primitive` (R:stated-fiber).
     parameter: ($) =>
-      seq(
-        field("name", $._pattern),
-        optional(seq(":", field("type", $.type_annotation))),
-        optional(seq("=", repeat($._newline), field("default", $._expression))),
+      choice(
+        seq(
+          field("name", $.site_pattern),
+          ":",
+          field("type", $.type_annotation),
+          optional(
+            seq("=", repeat($._newline), field("default", $._expression)),
+          ),
+        ),
+        seq(
+          field("name", $._pattern),
+          optional(seq(":", field("type", $.type_annotation))),
+          optional(
+            seq("=", repeat($._newline), field("default", $._expression)),
+          ),
+        ),
       ),
 
     type_annotation: ($) =>
@@ -670,7 +710,6 @@ module.exports = grammar({
         $.string,
         $.list,
         $.product,
-        $.site,
         $.parenthesized_expression,
         $.map,
         $.body,
@@ -686,6 +725,7 @@ module.exports = grammar({
         $.binary_expression,
         $.with_expression,
         $.but_expression,
+        $.where_expression,
         $.absent_expression,
         $.index_expression,
         $.component_expression,
@@ -734,9 +774,6 @@ module.exports = grammar({
       ),
 
     // `not`, above the comparisons and below `and`
-    // unary `+` — the mirror of `-`, returning a numeric operand unchanged.
-    // It takes the binary operator's token: two tokens spelling one text
-    // would leave the lexer, not the parser, to choose between them.
     unary_expression: ($) =>
       choice(
         prec(
@@ -755,32 +792,20 @@ module.exports = grammar({
             field("operand", $._expression),
           ),
         ),
-        prec(
-          9,
-          seq(
-            field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
-            repeat($._newline),
-            field("operand", $._expression),
-          ),
-        ),
       ),
 
     // `a..b` / `a..=b` — the loosest operator there is, Rust's own
     // precedence, so `0..n - 1` reads `0..(n - 1)`. It groups left here,
     // and the lowering refuses `a..b..c`: a range states two endpoints.
+    // An end reads no brace, which is a header's body after `for i in 3..`.
+    // The end stands on the operator's line: `0..` is complete as the open
+    // range, so a newline after the operator ends it (spec §2.1).
     range_expression: ($) =>
       prec.left(
         1,
         seq(
           field("left", $._expression),
-          field(
-            "operator",
-            choice(
-              alias(token(/(\n[ \t\r]*)*\.\.=/), "..="),
-              alias(token(/(\n[ \t\r]*)*\.\./), ".."),
-            ),
-          ),
-          repeat($._newline),
+          field("operator", choice("..=", "..")),
           field("right", $._expression),
         ),
       ),
@@ -946,6 +971,26 @@ module.exports = grammar({
         ),
       ),
 
+    // `base where key: value` — the site selection (R:product-fit): the
+    // field on the left with the sites the key states holding the value and
+    // every other site kept. The key is an expression — a site, a range or a
+    // box, `space(x)`, a mask — closed by its colon, so it reads no
+    // configuration zone; the chain groups left at `but`'s precedence, and a
+    // line opening with `where` continues the one above.
+    where_expression: ($) =>
+      prec.left(
+        11,
+        seq(
+          field("target", $._expression),
+          choice("where", alias(token(/(\n[ \t\r]*)+where[ \t\r\n]/), "where")),
+          repeat($._newline),
+          field("key", $._expression_1),
+          ":",
+          repeat($._newline),
+          field("value", $._expression),
+        ),
+      ),
+
     // `f(x?, y)` — the argument mark (R:absence-flow): a postfix `?` says
     // the slot it stands on licenses absence. It rides the postfix chain,
     // so a call result marks too — `points(vec(x, y)?)`.
@@ -1045,7 +1090,6 @@ module.exports = grammar({
           $.string,
           $.list,
           $.product,
-          $.site,
           $.parenthesized_expression,
           $.map,
           $.body,
@@ -1061,6 +1105,7 @@ module.exports = grammar({
           alias($.binary_expression_1, $.binary_expression),
           alias($.with_expression_1, $.with_expression),
           alias($.but_expression_1, $.but_expression),
+          alias($.where_expression_1, $.where_expression),
           alias($.absent_expression_1, $.absent_expression),
           alias($.index_expression_1, $.index_expression),
           alias($.component_expression_1, $.component_expression),
@@ -1116,14 +1161,6 @@ module.exports = grammar({
             field("operand", $._expression_1),
           ),
         ),
-        prec(
-          19,
-          seq(
-            field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
-            repeat($._newline),
-            field("operand", $._expression_1),
-          ),
-        ),
       ),
 
     range_expression_1: ($) =>
@@ -1131,14 +1168,7 @@ module.exports = grammar({
         3,
         seq(
           field("left", $._expression_1),
-          field(
-            "operator",
-            choice(
-              alias(token(/(\n[ \t\r]*)*\.\.=/), "..="),
-              alias(token(/(\n[ \t\r]*)*\.\./), ".."),
-            ),
-          ),
-          repeat($._newline),
+          field("operator", choice("..=", "..")),
           field("right", $._expression_1),
         ),
       ),
@@ -1276,6 +1306,20 @@ module.exports = grammar({
         ),
       ),
 
+    where_expression_1: ($) =>
+      prec.left(
+        23,
+        seq(
+          field("target", $._expression_1),
+          choice("where", alias(token(/(\n[ \t\r]*)+where[ \t\r\n]/), "where")),
+          repeat($._newline),
+          field("key", $._expression_1),
+          ":",
+          repeat($._newline),
+          field("value", $._expression_1),
+        ),
+      ),
+
     absent_expression_1: ($) =>
       prec.left(27, seq(field("value", $._expression_1), "?")),
 
@@ -1318,7 +1362,6 @@ module.exports = grammar({
           $.string,
           $.list,
           $.product,
-          $.site,
           $.parenthesized_expression,
           $.map,
           $.body,
@@ -1334,6 +1377,7 @@ module.exports = grammar({
           alias($.binary_expression_2, $.binary_expression),
           alias($.with_expression_2, $.with_expression),
           alias($.but_expression_2, $.but_expression),
+          alias($.where_expression_2, $.where_expression),
           alias($.absent_expression_2, $.absent_expression),
           alias($.index_expression_2, $.index_expression),
           alias($.component_expression_2, $.component_expression),
@@ -1390,14 +1434,6 @@ module.exports = grammar({
             field("operand", $._expression_2),
           ),
         ),
-        prec(
-          19,
-          seq(
-            field("operator", alias(token(/(\n[ \t\r]*)*\+/), "+")),
-            repeat($._newline),
-            field("operand", $._expression_2),
-          ),
-        ),
       ),
 
     range_expression_2: ($) =>
@@ -1405,14 +1441,7 @@ module.exports = grammar({
         3,
         seq(
           field("left", $._expression_2),
-          field(
-            "operator",
-            choice(
-              alias(token(/(\n[ \t\r]*)*\.\.=/), "..="),
-              alias(token(/(\n[ \t\r]*)*\.\./), ".."),
-            ),
-          ),
-          repeat($._newline),
+          field("operator", choice("..=", "..")),
           field("right", $._expression_2),
         ),
       ),
@@ -1550,6 +1579,20 @@ module.exports = grammar({
         ),
       ),
 
+    where_expression_2: ($) =>
+      prec.left(
+        23,
+        seq(
+          field("target", $._expression_2),
+          choice("where", alias(token(/(\n[ \t\r]*)+where[ \t\r\n]/), "where")),
+          repeat($._newline),
+          field("key", $._expression_1),
+          ":",
+          repeat($._newline),
+          field("value", $._expression_2),
+        ),
+      ),
+
     absent_expression_2: ($) =>
       prec.left(27, seq(field("value", $._expression_2), "?")),
 
@@ -1595,7 +1638,7 @@ module.exports = grammar({
     // `(D: Real, E: Real)(1, 0)`, which is the anonymous spelling of a
     // declared product's constructor (R:product-fiber, R:stated-fiber):
     // in head position the parens can hold nothing else, since neither
-    // a product value nor a site literal takes arguments.
+    // a product value nor a grouping takes arguments.
     call_expression: ($) =>
       prec(
         2,
@@ -1753,34 +1796,49 @@ module.exports = grammar({
       ),
 
     // One axis selector (R:located-field): an ordinary expression — an
-    // Int global coordinate or a range restriction — or an
-    // open-ended range form, admitted in subscript position alone,
-    // where the target's own box bounds the missing end: `a[4..]`,
-    // `a[..10]`, `a[..=10]`, `a[..]`. `..=` with no end has nothing to
+    // Int global coordinate or a range restriction — or an open
+    // range, where the target's own box bounds the missing end:
+    // `a[4..]`, `a[..10]`, `a[..=10]`, `a[..]`.
+    selector: ($) => choice($.open_range, $._expression),
+
+    // An axis open at one end or both (R:located-field). In a subscript
+    // the target's own box bounds the missing end; as an entry of a
+    // `for` header's box literal it states an axis the comprehension
+    // does not bound, and the comprehension is a rule. The lowering
+    // refuses it anywhere else. `..=` with no end has nothing to
     // reach, which the lowering says.
-    selector: ($) =>
+    open_range: ($) =>
       choice(
         seq(
-          field(
-            "operator",
-            choice(
-              alias(token(/(\n[ \t\r]*)*\.\.=/), "..="),
-              alias(token(/(\n[ \t\r]*)*\.\./), ".."),
-            ),
-          ),
+          field("operator", choice("..=", "..")),
           optional(field("end", $._expression)),
         ),
-        seq(
-          field("start", $._expression),
-          field(
-            "operator",
-            choice(
-              alias(token(/(\n[ \t\r]*)*\.\.=/), "..="),
-              alias(token(/(\n[ \t\r]*)*\.\./), ".."),
-            ),
+        prec(
+          -1,
+          seq(
+            field("start", $._expression),
+            field("operator", choice("..=", "..")),
           ),
         ),
-        $._expression,
+      ),
+
+    // The open axis a `for` header's collection states alone,
+    // `for i in .. { … }`, `for i in 3.. { … }`: its ends are the
+    // header's own expressions, and a missing end reads no brace,
+    // which is the header's body (R:located-field).
+    header_open_range: ($) =>
+      choice(
+        seq(
+          field("operator", choice("..=", "..")),
+          optional(field("end", $._expression_1)),
+        ),
+        prec(
+          3,
+          seq(
+            field("start", $._expression_1),
+            field("operator", choice("..=", "..")),
+          ),
+        ),
       ),
 
     // a name, and what a name reaches: an index picks a style out of a
@@ -1820,10 +1878,10 @@ module.exports = grammar({
               repeat($._newline),
               "for",
               repeat($._newline),
-              field("element", $.identifier),
+              field("element", $.binder_list),
               "in",
               repeat($._newline),
-              field("driver", $._expression_1),
+              field("driver", choice($.header_open_range, $._expression_1)),
             ),
           ),
           optional(
@@ -1918,7 +1976,7 @@ module.exports = grammar({
     else_arm: ($) =>
       seq("else", repeat($._newline), field("body", $._expression)),
 
-    // `for (i, j) in space { body }` and `for I in space body` — the
+    // `for [i, j] in space { body }` and `for I in space body` — the
     // comprehension, the header family's third member (R:located-field,
     // R:site-value). The braced body has the higher dynamic precedence,
     // which is how the grammar states the loop-header zone rule: a
@@ -1934,7 +1992,7 @@ module.exports = grammar({
         field("binders", $.binder_list),
         "in",
         repeat($._newline),
-        field("space", $._expression_1),
+        field("space", choice($.header_open_range, $._expression_1)),
         choice(
           prec.dynamic(2, field("body", $.body)),
           prec.dynamic(1, field("body", $._expression)),
@@ -1954,53 +2012,56 @@ module.exports = grammar({
         field("binders", $.binder_list),
         "in",
         repeat($._newline),
-        field("collection", $._expression_1),
+        field("collection", choice($.header_open_range, $._expression_1)),
         choice(
           prec.dynamic(2, field("body", $.body)),
           prec.dynamic(1, field("body", $._expression)),
         ),
       ),
 
-    // the punctuation means one thing in both positions: one pattern
-    // binds the collection's element (R:site-value) — a name takes it
-    // whole, a parenthesized comma tuple is a site and destructures it
-    // one sub-pattern per axis, a constructor pattern reads its
-    // components — and brackets are a list of things, here one pattern
-    // per collection of the lockstep walk (R:binder-collection). That
-    // the bracket walks at least two collections, the lowering states.
-    binder_list: ($) =>
-      choice(
-        seq(
-          "[",
-          $._lockstep_binder,
-          repeat(
-            seq(repeat($._newline), ",", repeat($._newline), $._lockstep_binder),
-          ),
-          "]",
-        ),
-        $._pattern,
-      ),
-
-    _lockstep_binder: ($) => $._pattern,
+    // a header's binder is one pattern (spec §2.7, R:box-as-ranges): a
+    // name takes the element whole, a bracket destructures — the site of
+    // a box one name per axis, or a lockstep's collections one pattern
+    // apiece, which the lowering tells apart by the collection — and a
+    // constructor pattern reads components. `(i, j)` is no pattern here,
+    // and says so naming the bracket.
+    binder_list: ($) => $._pattern,
 
     // A pattern — what stands wherever a name is bound (spec §2.10): a
     // local, a `for` binder, a parameter, a control binder and a
     // top-level item. A name binds the value whole, `_` binds nothing,
-    // `(i, j)` is the site tuple, `Cons(d, s, tau)` reads a declared
-    // product's components in the declared order, `(at: p)` reads
-    // components by name (R:product-fiber), and `{ rho, vel }` reads
-    // a Map's entries by key. Every sub-pattern position
-    // takes any pattern, so the form nests. The three parenthesized
-    // forms begin the way an expression does, and the token after the
-    // first name decides between them; the braced form begins the way
-    // a Map literal does, and the `:=` after it decides.
+    // `[i, j]` reads a static list's positions (R:box-as-ranges),
+    // `Cons(d, s, tau)` reads a declared product's components in the
+    // declared order, `(at: p)` reads components by name
+    // (R:product-fiber), and `{ rho, vel }` reads a Map's entries by
+    // key. Every sub-pattern position takes any pattern, so the form
+    // nests. The named parens begin the way an expression does, and
+    // the token after the first name decides; the braced form begins
+    // the way a Map literal does, and the `:=` after it decides. A
+    // positional tuple, `(rho, _, pre)`, stands only at a parameter or
+    // a local stating the fiber it reads (R:stated-fiber).
     _pattern: ($) =>
       choice(
         $.constructor_pattern,
         $.named_pattern,
-        $.site_pattern,
+        $.list_pattern,
         $.map_pattern,
         $.identifier,
+      ),
+
+    // `[i, j]`, `[[i, j], t]` — a static list destructured, one
+    // sub-pattern per position (R:box-as-ranges): the List literal read
+    // backwards. The length is the right side's kind's, so a list of no
+    // known length refuses at check time. A position is a pattern again,
+    // and a parenthesized one is none: a bracket nests in a bracket.
+    list_pattern: ($) =>
+      seq(
+        "[",
+        repeat(choice(",", $._newline)),
+        $._pattern,
+        repeat(seq(repeat1(choice(",", $._newline)), $._pattern)),
+        repeat(choice(",", $._newline)),
+        "]",
       ),
 
     // `Cons(d, vec(sx, sy), _)` — the components of `vec` or of a
@@ -2039,8 +2100,8 @@ module.exports = grammar({
     // `(at: p, grab: q)`, `(0: x, 2: z)` — components by key, any subset
     // in any order. It mirrors the value form a readout writes for an
     // unnamed product (R:product-fiber), it is the form the gesture
-    // products take, and an integer key reads a `vec`, a site or a
-    // `Complex` by position (R:component-key).
+    // products take, and an integer key reads a `vec` or a `Complex`
+    // by position (R:component-key).
     named_pattern: ($) =>
       seq(
         "(",
@@ -2087,21 +2148,30 @@ module.exports = grammar({
         field("key", $.identifier),
       ),
 
-    // `(i, j)` — a site tuple, one sub-pattern per axis
-    // (R:site-value). A rank-1 box destructures into one axis, so
-    // `(i)` states the one-wide tuple where the site literal `(3)` is
-    // grouping: parens hold a pattern where they hold no expression.
+    // `(rho, _, pre): Primitive` — a positional tuple, one sub-pattern
+    // per component of the fiber the binding site states after it, in
+    // declared order (R:stated-fiber), a nested tuple reading a
+    // component's own components, `(d, (sx, _), _): Cons`. A site is a
+    // static list and destructures with a bracket, `[i, j]`
+    // (R:box-as-ranges).
     site_pattern: ($) =>
       seq(
         "(",
-        $._pattern,
-        repeat(seq(repeat($._newline), ",", repeat($._newline), $._pattern)),
+        choice($.site_pattern, $._pattern),
+        repeat(
+          seq(
+            repeat($._newline),
+            ",",
+            repeat($._newline),
+            choice($.site_pattern, $._pattern),
+          ),
+        ),
         ")",
       ),
 
     // The key of a component read (R:component-key): a name for a
     // declared product fiber's component and for a `Color`'s channel,
-    // an integer for a `vec`, a site or a `Complex`, and a
+    // an integer for a `vec` or a `Complex`, and a
     // parenthesized pair for a `Mat` or a `Metric`. Nothing else
     // stands before `of`, so the key is read at elaboration rather
     // than computed.
@@ -2117,27 +2187,21 @@ module.exports = grammar({
         ),
       ),
 
-    // parens with commas build a site (R:site-value, the literal): one
-    // expression inside is grouping, and two or more are the
-    // coordinates of a position in ℤ^k. A name whose parens follow it
-    // immediately is still a call, and `f (n)` is that name beside
-    // this literal. Newline separates as comma does, as in every
-    // bracketed run.
-    site: ($) =>
+    // `(0, 1)` — a `Mat`'s or a `Metric`'s entry named by its row and
+    // column, where a product's component key stands (R:component-key).
+    position_pair: ($) =>
       seq(
         "(",
-        repeat(choice(",", $._newline)),
-        $._expression,
-        repeat1(seq(repeat1(choice(",", $._newline)), $._expression)),
-        repeat(choice(",", $._newline)),
+        $.number,
+        repeat1(seq(repeat($._newline), ",", repeat($._newline), $.number)),
         ")",
       ),
 
     // `(D: 1.0, S: vec(0.3, 0.4), tau: 2.5)` — a product fiber's value
     // stated component by component (R:product-fiber), and the override
     // a `but` takes (R:product-fit), one component included. A component
-    // key and its colon tell it from the site literal and from grouping
-    // parens, both of which hold bare expressions. An integer key names
+    // key and its colon tell it from grouping parens, which hold a bare
+    // expression. An integer key names
     // a component by position, so `v but (0: e)` updates a `vec`
     // (R:component-key).
     product: ($) =>
@@ -2152,23 +2216,23 @@ module.exports = grammar({
 
     // the component wins over reading the key as an expression with a
     // configuration after it (R:product-fiber). A parenthesized run of
-    // coordinates in key position is the site key, so
-    // `A but ((i, j): 20.0)` writes one site of a field and
-    // `m but ((0, 1): 1.0)` one entry of a `Mat` — the base's rank
-    // decides which (R:component-key, R:product-fit).
+    // positions in key position is a component's position written out,
+    // `m but ((0, 1): 1.0)` one entry of a `Mat`; a key is never a site,
+    // the sites of a field being selected with `where`
+    // (R:component-key, R:product-fit).
     product_component: ($) =>
       prec(
         14,
         seq(
-          field("name", choice($.identifier, $.number, $.site)),
+          field("name", choice($.identifier, $.number, $.position_pair)),
           ":",
           repeat($._newline),
           field("value", $._expression),
         ),
       ),
 
-    // `(3,)` refuses: a comma inside parens builds a site, and the literal
-    // names two coordinates at least (R:index-table)
+    // `(3, 4)` and `(3,)` refuse: parens group one expression, and a
+    // site is the static list of its Ints, `[3, 4]` (R:box-as-ranges)
     parenthesized_expression: ($) =>
       seq(
         "(",
@@ -2178,14 +2242,21 @@ module.exports = grammar({
         ")",
       ),
 
+    // a List literal, and the box literal a header walks: an entry may
+    // be an open range, which only a `for` header's box admits
     list: ($) =>
       seq(
         "[",
         repeat(choice(",", $._newline)),
         optional(
           seq(
-            $._expression,
-            repeat(seq(repeat1(choice(",", $._newline)), $._expression)),
+            choice($.open_range, $._expression),
+            repeat(
+              seq(
+                repeat1(choice(",", $._newline)),
+                choice($.open_range, $._expression),
+              ),
+            ),
             repeat(choice(",", $._newline)),
           ),
         ),
@@ -2326,35 +2397,17 @@ module.exports = grammar({
         repeat(choice(",", $._newline)),
         optional(
           seq(
-            choice($.local, $.state_local, $.write, $.clause, $._expression),
+            choice($.local, $.state_local, $.write, $._expression),
             repeat(
               seq(
                 repeat1(choice(",", $._newline)),
-                choice($.local, $.state_local, $.write, $.clause, $._expression),
+                choice($.local, $.state_local, $.write, $._expression),
               ),
             ),
             repeat(choice(",", $._newline)),
           ),
         ),
         "}",
-      ),
-
-    // `in <box> { … }` and `in <box> value` — one piece of a clause
-    // comprehension (R:clause-comprehension). It is a body item, and
-    // the parser holds it to a brace directly under a `for` header;
-    // the box is read in the header's own zone rule, so the brace
-    // after it is the clause's body rather than a payload on the box.
-    // The body is braced or bare under the rule the header's body
-    // takes, and `in` opens the next clause.
-    clause: ($) =>
-      seq(
-        "in",
-        repeat($._newline),
-        field("space", $._expression_1),
-        choice(
-          prec.dynamic(2, field("body", $.body)),
-          prec.dynamic(1, field("body", $._expression)),
-        ),
       ),
 
     // `x := e` and `Cons(d, s, _) := u` — a local, whose left side is a
@@ -2367,14 +2420,25 @@ module.exports = grammar({
     // colon is the one a Map entry and a configuration zone take, so
     // a brace opening `{ c: Real := 2` shifts one token for all
     // three readings and keeps them alive to the `:=` that settles
-    // them.
+    // them. A positional tuple stands only with the fiber it reads
+    // stated after it, `(rho, _, pre): Primitive := p`
+    // (R:stated-fiber).
     local: ($) =>
       seq(
-        field("pattern", $._pattern),
-        optional(
+        choice(
           seq(
+            field("pattern", $.site_pattern),
             alias(token(/(\n[ \t\r]*)*:/), ":"),
             field("type", $.type_annotation),
+          ),
+          seq(
+            field("pattern", $._pattern),
+            optional(
+              seq(
+                alias(token(/(\n[ \t\r]*)*:/), ":"),
+                field("type", $.type_annotation),
+              ),
+            ),
           ),
         ),
         ":=",

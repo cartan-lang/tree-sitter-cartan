@@ -108,10 +108,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -129,6 +125,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -280,10 +280,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -301,6 +297,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -406,10 +406,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -427,6 +423,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -557,10 +557,6 @@
           "named": true
         },
         {
-          "type": "site",
-          "named": true
-        },
-        {
           "type": "string",
           "named": true
         },
@@ -578,6 +574,10 @@
         },
         {
           "type": "unary_expression",
+          "named": true
+        },
+        {
+          "type": "where_expression",
           "named": true
         },
         {
@@ -696,10 +696,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -717,6 +713,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -836,10 +836,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -857,6 +853,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -1040,10 +1040,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -1064,6 +1060,10 @@
             "named": true
           },
           {
+            "type": "where_expression",
+            "named": true
+          },
+          {
             "type": "with_expression",
             "named": true
           }
@@ -1076,8 +1076,8 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
-      "required": false,
+      "multiple": false,
+      "required": true,
       "types": [
         {
           "type": "constructor_pattern",
@@ -1088,15 +1088,15 @@
           "named": true
         },
         {
+          "type": "list_pattern",
+          "named": true
+        },
+        {
           "type": "map_pattern",
           "named": true
         },
         {
           "type": "named_pattern",
-          "named": true
-        },
-        {
-          "type": "site_pattern",
           "named": true
         }
       ]
@@ -1231,10 +1231,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -1252,6 +1248,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -1292,10 +1292,6 @@
         },
         {
           "type": "call_expression",
-          "named": true
-        },
-        {
-          "type": "clause",
           "named": true
         },
         {
@@ -1379,10 +1375,6 @@
           "named": true
         },
         {
-          "type": "site",
-          "named": true
-        },
-        {
           "type": "state_local",
           "named": true
         },
@@ -1404,6 +1396,10 @@
         },
         {
           "type": "unary_expression",
+          "named": true
+        },
+        {
+          "type": "where_expression",
           "named": true
         },
         {
@@ -1531,10 +1527,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -1552,6 +1544,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -1665,10 +1661,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -1686,6 +1678,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -1758,272 +1754,6 @@
         "types": [
           {
             "type": "variant_arguments",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "clause",
-    "named": true,
-    "fields": {
-      "body": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "absent_expression",
-            "named": true
-          },
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "body",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "but_expression",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "component_expression",
-            "named": true
-          },
-          {
-            "type": "conditional_expression",
-            "named": true
-          },
-          {
-            "type": "config_expression",
-            "named": true
-          },
-          {
-            "type": "each_expression",
-            "named": true
-          },
-          {
-            "type": "fold_expression",
-            "named": true
-          },
-          {
-            "type": "for_expression",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "index_expression",
-            "named": true
-          },
-          {
-            "type": "list",
-            "named": true
-          },
-          {
-            "type": "map",
-            "named": true
-          },
-          {
-            "type": "match_expression",
-            "named": true
-          },
-          {
-            "type": "none",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "payload_expression",
-            "named": true
-          },
-          {
-            "type": "periodic_expression",
-            "named": true
-          },
-          {
-            "type": "product",
-            "named": true
-          },
-          {
-            "type": "qualified_identifier",
-            "named": true
-          },
-          {
-            "type": "range_expression",
-            "named": true
-          },
-          {
-            "type": "site",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "tap_expression",
-            "named": true
-          },
-          {
-            "type": "template_string",
-            "named": true
-          },
-          {
-            "type": "triple_string",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "with_expression",
-            "named": true
-          }
-        ]
-      },
-      "space": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "absent_expression",
-            "named": true
-          },
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "body",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "but_expression",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "component_expression",
-            "named": true
-          },
-          {
-            "type": "conditional_expression",
-            "named": true
-          },
-          {
-            "type": "each_expression",
-            "named": true
-          },
-          {
-            "type": "fold_expression",
-            "named": true
-          },
-          {
-            "type": "for_expression",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "index_expression",
-            "named": true
-          },
-          {
-            "type": "list",
-            "named": true
-          },
-          {
-            "type": "map",
-            "named": true
-          },
-          {
-            "type": "match_expression",
-            "named": true
-          },
-          {
-            "type": "none",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "periodic_expression",
-            "named": true
-          },
-          {
-            "type": "product",
-            "named": true
-          },
-          {
-            "type": "qualified_identifier",
-            "named": true
-          },
-          {
-            "type": "range_expression",
-            "named": true
-          },
-          {
-            "type": "site",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "tap_expression",
-            "named": true
-          },
-          {
-            "type": "template_string",
-            "named": true
-          },
-          {
-            "type": "triple_string",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "with_expression",
             "named": true
           }
         ]
@@ -2175,10 +1905,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -2196,6 +1922,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -2334,10 +2064,6 @@
           "named": true
         },
         {
-          "type": "site",
-          "named": true
-        },
-        {
           "type": "string",
           "named": true
         },
@@ -2355,6 +2081,10 @@
         },
         {
           "type": "unary_expression",
+          "named": true
+        },
+        {
+          "type": "where_expression",
           "named": true
         },
         {
@@ -2473,10 +2203,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -2494,6 +2220,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -2607,10 +2337,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -2628,6 +2354,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -2741,10 +2471,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -2762,6 +2488,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -2911,10 +2641,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -2932,6 +2658,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -2980,15 +2710,15 @@
           "named": true
         },
         {
+          "type": "list_pattern",
+          "named": true
+        },
+        {
           "type": "map_pattern",
           "named": true
         },
         {
           "type": "named_pattern",
-          "named": true
-        },
-        {
-          "type": "site_pattern",
           "named": true
         }
       ]
@@ -3155,10 +2885,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -3176,6 +2902,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -3233,6 +2963,10 @@
             "named": true
           },
           {
+            "type": "header_open_range",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           },
@@ -3281,10 +3015,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -3302,6 +3032,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -3421,10 +3155,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -3442,6 +3172,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -3472,16 +3206,6 @@
         "types": [
           {
             "type": "component",
-            "named": true
-          }
-        ]
-      },
-      "module": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "fiber_type",
             "named": true
           }
         ]
@@ -3538,6 +3262,16 @@
         "types": [
           {
             "type": "struct_type",
+            "named": true
+          }
+        ]
+      },
+      "list": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "static_list_type",
             "named": true
           }
         ]
@@ -3685,6 +3419,10 @@
             "named": true
           },
           {
+            "type": "header_open_range",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           },
@@ -3733,10 +3471,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -3757,6 +3491,10 @@
             "named": true
           },
           {
+            "type": "where_expression",
+            "named": true
+          },
+          {
             "type": "with_expression",
             "named": true
           }
@@ -3767,7 +3505,7 @@
         "required": false,
         "types": [
           {
-            "type": "identifier",
+            "type": "binder_list",
             "named": true
           }
         ]
@@ -3869,10 +3607,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -3890,6 +3624,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -4009,10 +3747,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -4030,6 +3764,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -4159,10 +3897,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -4180,6 +3914,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -4237,6 +3975,10 @@
             "named": true
           },
           {
+            "type": "header_open_range",
+            "named": true
+          },
+          {
             "type": "identifier",
             "named": true
           },
@@ -4285,10 +4027,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -4306,6 +4044,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -4425,10 +4167,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -4446,6 +4184,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -4480,6 +4222,278 @@
         "types": [
           {
             "type": "parameter_list",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "header_open_range",
+    "named": true,
+    "fields": {
+      "end": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "..",
+            "named": false
+          },
+          {
+            "type": "..=",
+            "named": false
+          }
+        ]
+      },
+      "start": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
             "named": true
           }
         ]
@@ -4595,10 +4609,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -4616,6 +4626,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -4775,10 +4789,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -4796,6 +4806,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -4956,10 +4970,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -4977,6 +4987,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -5072,6 +5086,10 @@
           "named": true
         },
         {
+          "type": "open_range",
+          "named": true
+        },
+        {
           "type": "parenthesized_expression",
           "named": true
         },
@@ -5096,10 +5114,6 @@
           "named": true
         },
         {
-          "type": "site",
-          "named": true
-        },
-        {
           "type": "string",
           "named": true
         },
@@ -5120,7 +5134,42 @@
           "named": true
         },
         {
+          "type": "where_expression",
+          "named": true
+        },
+        {
           "type": "with_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "list_pattern",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "constructor_pattern",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "list_pattern",
+          "named": true
+        },
+        {
+          "type": "map_pattern",
+          "named": true
+        },
+        {
+          "type": "named_pattern",
           "named": true
         }
       ]
@@ -5140,6 +5189,10 @@
           },
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "list_pattern",
             "named": true
           },
           {
@@ -5271,10 +5324,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -5292,6 +5341,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -5411,10 +5464,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -5432,6 +5481,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -5584,10 +5637,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -5605,6 +5654,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -5657,15 +5710,15 @@
             "named": true
           },
           {
+            "type": "list_pattern",
+            "named": true
+          },
+          {
             "type": "map_pattern",
             "named": true
           },
           {
             "type": "named_pattern",
-            "named": true
-          },
-          {
-            "type": "site_pattern",
             "named": true
           }
         ]
@@ -5797,10 +5850,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -5818,6 +5867,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -5947,10 +6000,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -5968,6 +6017,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -6087,10 +6140,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -6108,6 +6157,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -6129,15 +6182,15 @@
             "named": true
           },
           {
+            "type": "list_pattern",
+            "named": true
+          },
+          {
             "type": "map_pattern",
             "named": true
           },
           {
             "type": "named_pattern",
-            "named": true
-          },
-          {
-            "type": "site_pattern",
             "named": true
           }
         ]
@@ -6265,10 +6318,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -6286,6 +6335,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -6356,15 +6409,15 @@
             "named": true
           },
           {
+            "type": "list_pattern",
+            "named": true
+          },
+          {
             "type": "map_pattern",
             "named": true
           },
           {
             "type": "named_pattern",
-            "named": true
-          },
-          {
-            "type": "site_pattern",
             "named": true
           }
         ]
@@ -6421,6 +6474,294 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "open_range",
+    "named": true,
+    "fields": {
+      "end": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      },
+      "operator": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "..",
+            "named": false
+          },
+          {
+            "type": "..=",
+            "named": false
+          }
+        ]
+      },
+      "start": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -6532,10 +6873,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -6556,6 +6893,10 @@
             "named": true
           },
           {
+            "type": "where_expression",
+            "named": true
+          },
+          {
             "type": "with_expression",
             "named": true
           }
@@ -6571,6 +6912,10 @@
           },
           {
             "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "list_pattern",
             "named": true
           },
           {
@@ -6723,10 +7068,6 @@
           "named": true
         },
         {
-          "type": "site",
-          "named": true
-        },
-        {
           "type": "string",
           "named": true
         },
@@ -6747,6 +7088,10 @@
           "named": true
         },
         {
+          "type": "where_expression",
+          "named": true
+        },
+        {
           "type": "with_expression",
           "named": true
         }
@@ -6762,15 +7107,15 @@
         "required": true,
         "types": [
           {
+            "type": "list_pattern",
+            "named": true
+          },
+          {
             "type": "map_pattern",
             "named": true
           },
           {
             "type": "named_pattern",
-            "named": true
-          },
-          {
-            "type": "site_pattern",
             "named": true
           }
         ]
@@ -6880,10 +7225,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -6901,6 +7242,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -7034,10 +7379,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -7055,6 +7396,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -7174,10 +7519,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -7195,6 +7536,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -7358,10 +7703,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -7382,11 +7723,30 @@
             "named": true
           },
           {
+            "type": "where_expression",
+            "named": true
+          },
+          {
             "type": "with_expression",
             "named": true
           }
         ]
       }
+    }
+  },
+  {
+    "type": "position_pair",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -7421,7 +7781,7 @@
             "named": true
           },
           {
-            "type": "site",
+            "type": "position_pair",
             "named": true
           }
         ]
@@ -7531,10 +7891,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -7552,6 +7908,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -7697,10 +8057,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -7718,6 +8074,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -7845,10 +8205,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -7866,6 +8222,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -7879,431 +8239,9 @@
   {
     "type": "selector",
     "named": true,
-    "fields": {
-      "end": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "absent_expression",
-            "named": true
-          },
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "body",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "but_expression",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "component_expression",
-            "named": true
-          },
-          {
-            "type": "conditional_expression",
-            "named": true
-          },
-          {
-            "type": "config_expression",
-            "named": true
-          },
-          {
-            "type": "each_expression",
-            "named": true
-          },
-          {
-            "type": "fold_expression",
-            "named": true
-          },
-          {
-            "type": "for_expression",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "index_expression",
-            "named": true
-          },
-          {
-            "type": "list",
-            "named": true
-          },
-          {
-            "type": "map",
-            "named": true
-          },
-          {
-            "type": "match_expression",
-            "named": true
-          },
-          {
-            "type": "none",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "payload_expression",
-            "named": true
-          },
-          {
-            "type": "periodic_expression",
-            "named": true
-          },
-          {
-            "type": "product",
-            "named": true
-          },
-          {
-            "type": "qualified_identifier",
-            "named": true
-          },
-          {
-            "type": "range_expression",
-            "named": true
-          },
-          {
-            "type": "site",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "tap_expression",
-            "named": true
-          },
-          {
-            "type": "template_string",
-            "named": true
-          },
-          {
-            "type": "triple_string",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "with_expression",
-            "named": true
-          }
-        ]
-      },
-      "operator": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "..",
-            "named": false
-          },
-          {
-            "type": "..=",
-            "named": false
-          }
-        ]
-      },
-      "start": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "absent_expression",
-            "named": true
-          },
-          {
-            "type": "binary_expression",
-            "named": true
-          },
-          {
-            "type": "body",
-            "named": true
-          },
-          {
-            "type": "boolean",
-            "named": true
-          },
-          {
-            "type": "but_expression",
-            "named": true
-          },
-          {
-            "type": "call_expression",
-            "named": true
-          },
-          {
-            "type": "component_expression",
-            "named": true
-          },
-          {
-            "type": "conditional_expression",
-            "named": true
-          },
-          {
-            "type": "config_expression",
-            "named": true
-          },
-          {
-            "type": "each_expression",
-            "named": true
-          },
-          {
-            "type": "fold_expression",
-            "named": true
-          },
-          {
-            "type": "for_expression",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "index_expression",
-            "named": true
-          },
-          {
-            "type": "list",
-            "named": true
-          },
-          {
-            "type": "map",
-            "named": true
-          },
-          {
-            "type": "match_expression",
-            "named": true
-          },
-          {
-            "type": "none",
-            "named": true
-          },
-          {
-            "type": "number",
-            "named": true
-          },
-          {
-            "type": "parenthesized_expression",
-            "named": true
-          },
-          {
-            "type": "payload_expression",
-            "named": true
-          },
-          {
-            "type": "periodic_expression",
-            "named": true
-          },
-          {
-            "type": "product",
-            "named": true
-          },
-          {
-            "type": "qualified_identifier",
-            "named": true
-          },
-          {
-            "type": "range_expression",
-            "named": true
-          },
-          {
-            "type": "site",
-            "named": true
-          },
-          {
-            "type": "string",
-            "named": true
-          },
-          {
-            "type": "tap_expression",
-            "named": true
-          },
-          {
-            "type": "template_string",
-            "named": true
-          },
-          {
-            "type": "triple_string",
-            "named": true
-          },
-          {
-            "type": "unary_expression",
-            "named": true
-          },
-          {
-            "type": "with_expression",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "absent_expression",
-          "named": true
-        },
-        {
-          "type": "binary_expression",
-          "named": true
-        },
-        {
-          "type": "body",
-          "named": true
-        },
-        {
-          "type": "boolean",
-          "named": true
-        },
-        {
-          "type": "but_expression",
-          "named": true
-        },
-        {
-          "type": "call_expression",
-          "named": true
-        },
-        {
-          "type": "component_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
-          "type": "config_expression",
-          "named": true
-        },
-        {
-          "type": "each_expression",
-          "named": true
-        },
-        {
-          "type": "fold_expression",
-          "named": true
-        },
-        {
-          "type": "for_expression",
-          "named": true
-        },
-        {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "index_expression",
-          "named": true
-        },
-        {
-          "type": "list",
-          "named": true
-        },
-        {
-          "type": "map",
-          "named": true
-        },
-        {
-          "type": "match_expression",
-          "named": true
-        },
-        {
-          "type": "none",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parenthesized_expression",
-          "named": true
-        },
-        {
-          "type": "payload_expression",
-          "named": true
-        },
-        {
-          "type": "periodic_expression",
-          "named": true
-        },
-        {
-          "type": "product",
-          "named": true
-        },
-        {
-          "type": "qualified_identifier",
-          "named": true
-        },
-        {
-          "type": "range_expression",
-          "named": true
-        },
-        {
-          "type": "site",
-          "named": true
-        },
-        {
-          "type": "string",
-          "named": true
-        },
-        {
-          "type": "tap_expression",
-          "named": true
-        },
-        {
-          "type": "template_string",
-          "named": true
-        },
-        {
-          "type": "triple_string",
-          "named": true
-        },
-        {
-          "type": "unary_expression",
-          "named": true
-        },
-        {
-          "type": "with_expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "site",
-    "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
@@ -8383,6 +8321,10 @@
           "named": true
         },
         {
+          "type": "open_range",
+          "named": true
+        },
+        {
           "type": "parenthesized_expression",
           "named": true
         },
@@ -8407,10 +8349,6 @@
           "named": true
         },
         {
-          "type": "site",
-          "named": true
-        },
-        {
           "type": "string",
           "named": true
         },
@@ -8428,6 +8366,10 @@
         },
         {
           "type": "unary_expression",
+          "named": true
+        },
+        {
+          "type": "where_expression",
           "named": true
         },
         {
@@ -8451,6 +8393,10 @@
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "list_pattern",
           "named": true
         },
         {
@@ -8653,10 +8599,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -8677,7 +8619,41 @@
             "named": true
           },
           {
+            "type": "where_expression",
+            "named": true
+          },
+          {
             "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "static_list_type",
+    "named": true,
+    "fields": {
+      "item": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": "fiber_type",
+            "named": true
+          }
+        ]
+      },
+      "width": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "number",
             "named": true
           }
         ]
@@ -8872,10 +8848,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -8893,6 +8865,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -8930,15 +8906,15 @@
             "named": true
           },
           {
+            "type": "list_pattern",
+            "named": true
+          },
+          {
             "type": "map_pattern",
             "named": true
           },
           {
             "type": "named_pattern",
-            "named": true
-          },
-          {
-            "type": "site_pattern",
             "named": true
           }
         ]
@@ -9163,10 +9139,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -9187,6 +9159,10 @@
             "named": true
           },
           {
+            "type": "where_expression",
+            "named": true
+          },
+          {
             "type": "with_expression",
             "named": true
           }
@@ -9196,10 +9172,6 @@
         "multiple": false,
         "required": true,
         "types": [
-          {
-            "type": "+",
-            "named": false
-          },
           {
             "type": "-",
             "named": false
@@ -9413,10 +9385,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -9434,6 +9402,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -9457,6 +9429,406 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "where_expression",
+    "named": true,
+    "fields": {
+      "key": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "absent_expression",
+            "named": true
+          },
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "body",
+            "named": true
+          },
+          {
+            "type": "boolean",
+            "named": true
+          },
+          {
+            "type": "but_expression",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "component_expression",
+            "named": true
+          },
+          {
+            "type": "conditional_expression",
+            "named": true
+          },
+          {
+            "type": "config_expression",
+            "named": true
+          },
+          {
+            "type": "each_expression",
+            "named": true
+          },
+          {
+            "type": "fold_expression",
+            "named": true
+          },
+          {
+            "type": "for_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "index_expression",
+            "named": true
+          },
+          {
+            "type": "list",
+            "named": true
+          },
+          {
+            "type": "map",
+            "named": true
+          },
+          {
+            "type": "match_expression",
+            "named": true
+          },
+          {
+            "type": "none",
+            "named": true
+          },
+          {
+            "type": "number",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "payload_expression",
+            "named": true
+          },
+          {
+            "type": "periodic_expression",
+            "named": true
+          },
+          {
+            "type": "product",
+            "named": true
+          },
+          {
+            "type": "qualified_identifier",
+            "named": true
+          },
+          {
+            "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "string",
+            "named": true
+          },
+          {
+            "type": "tap_expression",
+            "named": true
+          },
+          {
+            "type": "template_string",
+            "named": true
+          },
+          {
+            "type": "triple_string",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
+            "named": true
+          },
+          {
+            "type": "with_expression",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -9583,10 +9955,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -9604,6 +9972,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -9717,10 +10089,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -9738,6 +10106,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -9867,10 +10239,6 @@
             "named": true
           },
           {
-            "type": "site",
-            "named": true
-          },
-          {
             "type": "string",
             "named": true
           },
@@ -9888,6 +10256,10 @@
           },
           {
             "type": "unary_expression",
+            "named": true
+          },
+          {
+            "type": "where_expression",
             "named": true
           },
           {
@@ -9956,6 +10328,10 @@
   },
   {
     "type": ":=",
+    "named": false
+  },
+  {
+    "type": ";",
     "named": false
   },
   {
@@ -10168,10 +10544,6 @@
     "named": false
   },
   {
-    "type": "torsor",
-    "named": false
-  },
-  {
     "type": "triple_string_content",
     "named": true
   },
@@ -10185,6 +10557,10 @@
   },
   {
     "type": "when",
+    "named": false
+  },
+  {
+    "type": "where",
     "named": false
   },
   {

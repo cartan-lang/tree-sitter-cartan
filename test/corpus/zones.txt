@@ -228,7 +228,66 @@ row = f[1, ..]
       index: (subscript
         (selector
           (number))
-        (selector)))))
+        (selector
+          (open_range))))))
+
+================================================================
+a header with an unbounded axis states a rule
+================================================================
+
+R = for i in .. { u[i] }
+S = for i in 3.. { u[i] }
+M = for [i, j] in [0..4, ..=n] { u[i, j] }
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (header_open_range)
+      body: (body
+        (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (identifier)))))))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (identifier))
+      space: (header_open_range
+        start: (number))
+      body: (body
+        (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (identifier)))))))
+  (binding
+    name: (identifier)
+    value: (for_expression
+      binders: (binder_list
+        (list_pattern
+          (identifier)
+          (identifier)))
+      space: (list
+        (range_expression
+          left: (number)
+          right: (number))
+        (open_range
+          end: (identifier)))
+      body: (body
+        (index_expression
+          target: (identifier)
+          index: (subscript
+            (selector
+              (identifier))
+            (selector
+              (identifier))))))))
 
 ================================================================
 a function declares its configuration
@@ -619,7 +678,7 @@ a comprehension binds over a stated box, and the brace is its body
 ================================================================
 
 B = for i in 0..100 { i }
-o = for (i, j) in [0..10, 0..10] { xw[i] * yw[j] }
+o = for [i, j] in [0..10, 0..10] { xw[i] * yw[j] }
 
 ----------------------------------------------------------------
 
@@ -638,7 +697,7 @@ o = for (i, j) in [0..10, 0..10] { xw[i] * yw[j] }
     name: (identifier)
     value: (for_expression
       binders: (binder_list
-        (site_pattern
+        (list_pattern
           (identifier)
           (identifier)))
       space: (list
@@ -708,7 +767,8 @@ tot = reduce s := 0.0 for x in xs { s + x }
     value: (fold_expression
       accumulator: (identifier)
       seed: (identifier)
-      element: (identifier)
+      element: (binder_list
+        (identifier))
       driver: (identifier)
       guard: (call_expression
         function: (identifier)
@@ -729,7 +789,8 @@ tot = reduce s := 0.0 for x in xs { s + x }
     value: (fold_expression
       accumulator: (identifier)
       seed: (number)
-      element: (identifier)
+      element: (binder_list
+        (identifier))
       driver: (identifier)
       body: (body
         (binary_expression
@@ -789,19 +850,19 @@ d = for i in 1..n u[i] - u[i - 1]
                 right: (number)))))))))
 
 ================================================================
-parens with commas build a site, and one expression is grouping
+parens group one expression, and a site is the static list of its Ints
 ================================================================
 
-p = (3, 4)
+p = [3, 4]
 g = (i + 1) * 2
-s = for I in space(A) { A[I + (0, 1)] }
+s = for I in space(A) { A[I] }
 
 ----------------------------------------------------------------
 
 (source_file
   (binding
     name: (identifier)
-    value: (site
+    value: (list
       (number)
       (number)))
   (binding
@@ -826,14 +887,10 @@ s = for I in space(A) { A[I + (0, 1)] }
           target: (identifier)
           index: (subscript
             (selector
-              (binary_expression
-                left: (identifier)
-                right: (site
-                  (number)
-                  (number))))))))))
+              (identifier))))))))
 
 ================================================================
-the lockstep bracket is a binder list, one binder per collection
+a bracket binder is a list pattern, one position per collection
 ================================================================
 
 s = for [a, b] in [A, B] { a + b }
@@ -846,8 +903,9 @@ d = for [x, y] in [0..10, 0..10] x * y
     name: (identifier)
     value: (for_expression
       binders: (binder_list
-        (identifier)
-        (identifier))
+        (list_pattern
+          (identifier)
+          (identifier)))
       space: (list
         (identifier)
         (identifier))
@@ -859,8 +917,9 @@ d = for [x, y] in [0..10, 0..10] x * y
     name: (identifier)
     value: (for_expression
       binders: (binder_list
-        (identifier)
-        (identifier))
+        (list_pattern
+          (identifier)
+          (identifier)))
       space: (list
         (range_expression
           left: (number)
@@ -877,7 +936,7 @@ the brace after a comprehension's space is the body, and the item
 after the header still binds
 ================================================================
 
-B = for (i, j) in [10, 10] { (i, j) }
+B = for [i, j] in [0..10, 0..10] { [i, j] }
 
 main = block {
     B
@@ -890,14 +949,18 @@ main = block {
     name: (identifier)
     value: (for_expression
       binders: (binder_list
-        (site_pattern
+        (list_pattern
           (identifier)
           (identifier)))
       space: (list
-        (number)
-        (number))
+        (range_expression
+          left: (number)
+          right: (number))
+        (range_expression
+          left: (number)
+          right: (number)))
       body: (body
-        (site
+        (list
           (identifier)
           (identifier)))))
   (binding
@@ -996,8 +1059,9 @@ main = [d, s, p, q, w, x]
       name: (identifier)
       type: (fiber_type
         name: (identifier)
-        (fiber_type
-          name: (identifier))
+        (type_annotation
+          (fiber_type
+            name: (identifier)))
         (number)))
     component: (component
       name: (identifier)
@@ -1250,11 +1314,10 @@ q = cam but (distance: d, focus: f) but (pose: p)
           value: (identifier))))))
 
 ================================================================
-a site in key position writes one sample of a field
+a position pair in key position writes one entry of a matrix
 ================================================================
 
-b = g but ((ti, tj): 1 - g[ti, tj])
-c = A but ((1, 2): 20.0, (k, l): 5.0)
+c = A but ((1, 2): 20.0, (0, 0): 5.0)
 d = a but (3: v)
 
 ----------------------------------------------------------------
@@ -1266,32 +1329,14 @@ d = a but (3: v)
       target: (identifier)
       override: (product
         (product_component
-          name: (site
-            (identifier)
-            (identifier))
-          value: (binary_expression
-            left: (number)
-            right: (index_expression
-              target: (identifier)
-              index: (subscript
-                (selector
-                  (identifier))
-                (selector
-                  (identifier)))))))))
-  (binding
-    name: (identifier)
-    value: (but_expression
-      target: (identifier)
-      override: (product
-        (product_component
-          name: (site
+          name: (position_pair
             (number)
             (number))
           value: (number))
         (product_component
-          name: (site
-            (identifier)
-            (identifier))
+          name: (position_pair
+            (number)
+            (number))
           value: (number)))))
   (binding
     name: (identifier)
@@ -1342,8 +1387,9 @@ sq(x) = x * x
         type: (type_annotation
           (fiber_type
             name: (identifier)
-            (fiber_type
-              name: (identifier))
+            (type_annotation
+              (fiber_type
+                name: (identifier)))
             (number)))))
     body: (identifier))
   (function_definition
@@ -1376,11 +1422,13 @@ sq(x) = x * x
         type: (type_annotation
           (fiber_type
             name: (identifier)
-            (fiber_type
-              name: (identifier)
+            (type_annotation
               (fiber_type
-                name: (identifier))
-              (number))
+                name: (identifier)
+                (type_annotation
+                  (fiber_type
+                    name: (identifier)))
+                (number)))
             (number))))
       (parameter
         name: (identifier)
@@ -1397,150 +1445,6 @@ sq(x) = x * x
     body: (binary_expression
       left: (identifier)
       right: (identifier))))
-
-================================================================
-a comprehension's brace holds clauses, each a box and a body
-================================================================
-
-u = for (i, j) in space(g) {
-    in inner { step(g, i, j) }
-    in left { step(g, inward(i), j) }
-}
-d = for i in 0..n {
-    in [0..1] { 0.0 }
-    in [1..n] { u[i] - u[i - 1] }
-}
-
-----------------------------------------------------------------
-
-(source_file
-  (binding
-    name: (identifier)
-    value: (for_expression
-      binders: (binder_list
-        (site_pattern
-          (identifier)
-          (identifier)))
-      space: (call_expression
-        function: (identifier)
-        arguments: (argument_list
-          (identifier)))
-      body: (body
-        (clause
-          space: (identifier)
-          body: (body
-            (call_expression
-              function: (identifier)
-              arguments: (argument_list
-                (identifier)
-                (identifier)
-                (identifier)))))
-        (clause
-          space: (identifier)
-          body: (body
-            (call_expression
-              function: (identifier)
-              arguments: (argument_list
-                (identifier)
-                (call_expression
-                  function: (identifier)
-                  arguments: (argument_list
-                    (identifier)))
-                (identifier))))))))
-  (binding
-    name: (identifier)
-    value: (for_expression
-      binders: (binder_list
-        (identifier))
-      space: (range_expression
-        left: (number)
-        right: (identifier))
-      body: (body
-        (clause
-          space: (list
-            (range_expression
-              left: (number)
-              right: (number)))
-          body: (body
-            (number)))
-        (clause
-          space: (list
-            (range_expression
-              left: (number)
-              right: (identifier)))
-          body: (body
-            (binary_expression
-              left: (index_expression
-                target: (identifier)
-                index: (subscript
-                  (selector
-                    (identifier))))
-              right: (index_expression
-                target: (identifier)
-                index: (subscript
-                  (selector
-                    (binary_expression
-                      left: (identifier)
-                      right: (number))))))))))))
-
-================================================================
-a clause's body is braced or bare, as the header's body is
-================================================================
-
-u = for i in 0..n {
-    in 0..1 u0[0]
-    in 1..n - 1 { u0[i] + 1.0 }
-    in n - 1..n u0[n - 1]
-}
-
-----------------------------------------------------------------
-
-(source_file
-  (binding
-    name: (identifier)
-    value: (for_expression
-      binders: (binder_list
-        (identifier))
-      space: (range_expression
-        left: (number)
-        right: (identifier))
-      body: (body
-        (clause
-          space: (range_expression
-            left: (number)
-            right: (number))
-          body: (index_expression
-            target: (identifier)
-            index: (subscript
-              (selector
-                (number)))))
-        (clause
-          space: (range_expression
-            left: (number)
-            right: (binary_expression
-              left: (identifier)
-              right: (number)))
-          body: (body
-            (binary_expression
-              left: (index_expression
-                target: (identifier)
-                index: (subscript
-                  (selector
-                    (identifier))))
-              right: (number))))
-        (clause
-          space: (range_expression
-            left: (binary_expression
-              left: (identifier)
-              right: (number))
-            right: (identifier))
-          body: (index_expression
-            target: (identifier)
-            index: (subscript
-              (selector
-                (binary_expression
-                  left: (identifier)
-                  right: (number))))))))))
 
 ================================================================
 every binding site states an optional fiber, and a description heads a constructor
@@ -1571,8 +1475,9 @@ z = block {
     type: (type_annotation
       (fiber_type
         name: (identifier)
-        (fiber_type
-          name: (identifier))
+        (type_annotation
+          (fiber_type
+            name: (identifier)))
         (number))
       alternative: (fiber_type
         name: (identifier)))
@@ -1661,8 +1566,9 @@ main = [a, b]
       name: (identifier)
       type: (fiber_type
         name: (identifier)
-        (fiber_type
-          name: (identifier))
+        (type_annotation
+          (fiber_type
+            name: (identifier)))
         (number)))
     variant: (variant
       name: (identifier)
@@ -1684,8 +1590,9 @@ main = [a, b]
           name: (identifier)
           type: (fiber_type
             name: (identifier)
-            (fiber_type
-              name: (identifier))
+            (type_annotation
+              (fiber_type
+                name: (identifier)))
             (number)))
         variant: (variant
           name: (identifier)
@@ -1825,7 +1732,6 @@ main = [sound(Prim(1.0, 0.0, 2.0)), head(Prim(1.0, 2.0, 3.0))]
               (number)
               (number))))))))
 
-
 ================================================================
 a bracketed payload is one row, on a bare head, a configured head and a call
 ================================================================
@@ -1950,7 +1856,7 @@ main = block {
 each binds a Map's entry under the pair pattern, and walks Lists in lockstep
 ================================================================
 
-pairs = each (k, v) in m { v }
+pairs = each [k, v] in m { v }
 lock = each [a, b] in [A, B] a + b
 
 ----------------------------------------------------------------
@@ -1960,7 +1866,7 @@ lock = each [a, b] in [A, B] a + b
     name: (identifier)
     value: (each_expression
       binders: (binder_list
-        (site_pattern
+        (list_pattern
           (identifier)
           (identifier)))
       collection: (identifier)
@@ -1970,8 +1876,9 @@ lock = each [a, b] in [A, B] a + b
     name: (identifier)
     value: (each_expression
       binders: (binder_list
-        (identifier)
-        (identifier))
+        (list_pattern
+          (identifier)
+          (identifier)))
       collection: (list
         (identifier)
         (identifier))
@@ -2031,7 +1938,7 @@ a Map pattern reads entries by key, at a parameter, a local and a binder
 
 f({ rho, vel }) = rho * vel
 g(m) = {
-    { rho: r, pos: (x, y) } := m
+    { rho: r, pos: [x, y] } := m
     r + x + y
 }
 main = each { rho, vel } in rows { rho * vel }
@@ -2064,7 +1971,7 @@ main = each { rho, vel } in rows { rho * vel }
             pattern: (identifier))
           (map_sub_pattern
             key: (identifier)
-            pattern: (site_pattern
+            pattern: (list_pattern
               (identifier)
               (identifier))))
         value: (identifier))
@@ -2174,7 +2081,7 @@ a Map pattern binds document names at a top-level item
 ================================================================
 
 { rho, vel } = m
-{ rho: r, pos: (x, y) } = node
+{ rho: r, pos: [x, y] } = node
 
 ----------------------------------------------------------------
 
@@ -2193,7 +2100,7 @@ a Map pattern binds document names at a top-level item
         pattern: (identifier))
       (map_sub_pattern
         key: (identifier)
-        pattern: (site_pattern
+        pattern: (list_pattern
           (identifier)
           (identifier))))
     value: (identifier)))
@@ -2346,8 +2253,9 @@ h5file: State = load("snap.h5")
         name: (identifier)
         type: (fiber_type
           name: (identifier)
-          (fiber_type
-            name: (identifier))
+          (type_annotation
+            (fiber_type
+              name: (identifier)))
           (number)))))
   (port_declaration
     name: (identifier)
@@ -2366,8 +2274,9 @@ h5file: State = load("snap.h5")
                   name: (identifier)
                   type: (fiber_type
                     name: (identifier)
-                    (fiber_type
-                      name: (identifier))
+                    (type_annotation
+                      (fiber_type
+                        name: (identifier)))
                     (number))))))))
       alternative: (fiber_type
         name: (identifier)))
@@ -2381,7 +2290,6 @@ h5file: State = load("snap.h5")
       function: (identifier)
       arguments: (argument_list
         (string)))))
-
 
 ================================================================
 a Map literal's walk states its entry with no brace around it
@@ -2419,8 +2327,9 @@ ds = { each [s, g] in [snacks, nutrition] (s): 1.0 / g }
     value: (map
       (map_walk
         binders: (binder_list
-          (identifier)
-          (identifier))
+          (list_pattern
+            (identifier)
+            (identifier)))
         collection: (list
           (identifier)
           (identifier))
@@ -2430,7 +2339,6 @@ ds = { each [s, g] in [snacks, nutrition] (s): 1.0 / g }
           value: (binary_expression
             left: (number)
             right: (identifier)))))))
-
 
 ================================================================
 a bare name standing alone is an item, and `=` keeps the binding
@@ -2557,10 +2465,11 @@ zs: List<orbit::Binary> = []
     type: (type_annotation
       (fiber_type
         name: (identifier)
-        (fiber_type
-          name: (qualified_identifier
-            namespace: (identifier)
-            name: (identifier)))))
+        (type_annotation
+          (fiber_type
+            name: (qualified_identifier
+              namespace: (identifier)
+              name: (identifier))))))
     value: (list)))
 
 ================================================================
@@ -2591,3 +2500,34 @@ shade = if locked(res) then 1 else 0
           (identifier)))
       consequence: (number)
       alternative: (number))))
+
+================================================================
+a site selection takes an expression key and chains on a continuation line
+================================================================
+
+a = b where [1, 2]: 20.0
+c = b where 0..1: 0.0
+    where m: v
+
+----------------------------------------------------------------
+
+(source_file
+  (binding
+    name: (identifier)
+    value: (where_expression
+      target: (identifier)
+      key: (list
+        (number)
+        (number))
+      value: (number)))
+  (binding
+    name: (identifier)
+    value: (where_expression
+      target: (where_expression
+        target: (identifier)
+        key: (range_expression
+          left: (number)
+          right: (number))
+        value: (number))
+      key: (identifier)
+      value: (identifier))))
